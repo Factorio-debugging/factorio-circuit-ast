@@ -1,6 +1,7 @@
 from __future__ import annotations
 from weakref import ref, ReferenceType
 
+import numpy as np
 from typing import List, Dict, Optional
 
 from .ASTNode import ASTNode, Signals
@@ -25,8 +26,8 @@ class Network:
     def dependant_from(self, node: ASTNode) -> None:
         self._dependants.append(ref(node))
 
-    def get_signal_value(self, signal: Signal) -> int:
-        return self._previous_state.setdefault(signal, 0)
+    def get_signal_value(self, signal: Signal) -> np.int32:
+        return self._previous_state.setdefault(signal, np.int32(0))
 
     def get_all_values(self) -> Signals:
         return self._previous_state
@@ -35,8 +36,10 @@ class Network:
         self._previous_state = self._current_state
         self._current_state = {}
 
-    def update_value(self, signal: Signal, value: int) -> None:
-        self._current_state[signal] = self._current_state.setdefault(signal, 0) + value
+    def update_value(self, signal: Signal, value: np.int32) -> None:
+        self._current_state[signal] = (
+            self._current_state.setdefault(signal, np.int32(0)) + value
+        )
 
     @property
     def depends(self) -> List[ReferenceType[ASTNode]]:

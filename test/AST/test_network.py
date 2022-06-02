@@ -21,23 +21,23 @@ class TestNetwork(unittest.TestCase):
 
     def test_tick(self):
         net = Network()
-        net._current_state[Signal.ADVANCED_CIRCUIT] = 10
+        net._current_state[Signal.ADVANCED_CIRCUIT] = np.int32(10)
         net.tick()
         self.assertEqual(net.get_signal_value(Signal.ADVANCED_CIRCUIT), 10)
 
     def test_update_value(self):
         net = Network()
-        net.update_value(Signal.SIGNAL_A, 10)
+        net.update_value(Signal.SIGNAL_A, np.int32(10))
         self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 0)
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 10)
         net.tick()
         self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 10)
         self.assertNotIn(Signal.SIGNAL_A, net._current_state)
-        net.update_value(Signal.SIGNAL_A, 10)
+        net.update_value(Signal.SIGNAL_A, np.int32(10))
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 10)
-        net.update_value(Signal.SIGNAL_A, 20)
+        net.update_value(Signal.SIGNAL_A, np.int32(20))
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 30)
-        net.update_value(Signal.ADVANCED_CIRCUIT, 500)
+        net.update_value(Signal.ADVANCED_CIRCUIT, np.int32(500))
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 30)
         self.assertEqual(net._current_state[Signal.ADVANCED_CIRCUIT], 500)
         net.tick()
@@ -47,10 +47,12 @@ class TestNetwork(unittest.TestCase):
     def test_get_all_values(self):
         net = Network()
         self.assertEqual(net.get_all_values(), {})
-        net.update_value(Signal.SIGNAL_A, 10)
-        net.update_value(Signal.SIGNAL_B, 30)
+        net.update_value(Signal.SIGNAL_A, np.int32(10))
+        net.update_value(Signal.SIGNAL_B, np.int32(30))
         self.assertEqual(net.get_all_values(), {})
         net.tick()
-        self.assertEqual(net.get_all_values(), {Signal.SIGNAL_A: 10, Signal.SIGNAL_B: 30})
+        self.assertEqual(
+            net.get_all_values(), {Signal.SIGNAL_A: 10, Signal.SIGNAL_B: 30}
+        )
         net.tick()
         self.assertEqual(net.get_all_values(), {})

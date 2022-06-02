@@ -24,10 +24,10 @@ class TestSignalOperand(unittest.TestCase):
         sig = Signal.SIGNAL_A
         op = SignalOperand(net, sig)
         self.assertEqual(op.value(), 0)
-        net.update_value(sig, 10)
+        net.update_value(sig, np.int32(10))
         net.tick()
         self.assertEqual(op.value(), 10)
-        net.update_value(Signal.SIGNAL_B, 10)
+        net.update_value(Signal.SIGNAL_B, np.int32(10))
         net.tick()
         self.assertEqual(op.value(), 0)
 
@@ -47,16 +47,16 @@ class TestSignalOperand(unittest.TestCase):
 
 class TestConstantOperand(unittest.TestCase):
     def test_constructo(self):
-        op = ConstantOperand(10)
+        op = ConstantOperand(np.int32(10))
         self.assertEqual(op.constant, 10)
 
     def test_value(self):
-        op = ConstantOperand(20)
+        op = ConstantOperand(np.int32(20))
         self.assertEqual(op.value(), 20)
 
     def test_eq(self):
-        op1 = ConstantOperand(10)
-        op2 = ConstantOperand(20)
+        op1 = ConstantOperand(np.int32(10))
+        op2 = ConstantOperand(np.int32(20))
         self.assertNotEqual(op1, op2)
         op3 = SignalOperand(Network(), Signal.SIGNAL_A)
         self.assertNotEqual(op1, op3)

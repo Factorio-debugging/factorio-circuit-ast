@@ -1,5 +1,6 @@
 from enum import Enum
 
+import numpy as np
 from typing import Optional, Any
 
 from .ASTNode import ASTNode, Signals
@@ -29,8 +30,8 @@ class Operation(ASTNode):
     ):
         super().__init__("Operation")
         self.operation: NumericOperator = operation
-        self.left: Operand = left if left else ConstantOperand(0)
-        self.right: Operand = right if right else ConstantOperand(0)
+        self.left: Operand = left if left else ConstantOperand(np.int32(0))
+        self.right: Operand = right if right else ConstantOperand(np.int32(0))
 
     def output(self) -> Signals:
         raise NotImplementedError("")
