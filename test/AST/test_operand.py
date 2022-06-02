@@ -1,6 +1,6 @@
 import unittest
 
-from processor_generator.AST.Operand import *
+from AST.Operand import *
 
 
 class TestSignalOperand(unittest.TestCase):
