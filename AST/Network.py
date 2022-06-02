@@ -27,8 +27,8 @@ class Network:
         self._dependants.append(ref(node))
 
     def get_signal_value(self, signal: Signal) -> np.int32:
-        assert not AbstractSignal.has_value(
-            signal
+        assert (
+            signal not in AbstractSignal
         ), f"only concrete signals are allowed in get_signal_value, got {signal}"
         return self._previous_state.setdefault(signal, np.int32(0))
 
@@ -40,9 +40,9 @@ class Network:
         self._current_state = {}
 
     def update_value(self, signal: Signal, value: np.int32) -> None:
-        assert not AbstractSignal.has_value(
-            signal
-        ), f"only concrete signals are allowed in get_signal_value, got {signal}"
+        assert (
+            signal not in AbstractSignal
+        ), f"only concrete signals are allowed in update_value, got {signal}"
         self._current_state[signal] = (
             self._current_state.setdefault(signal, np.int32(0)) + value
         )
