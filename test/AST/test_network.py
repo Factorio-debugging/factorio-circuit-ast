@@ -1,4 +1,4 @@
-from processor_generator.AST.Network import *
+from AST.Network import *
 import unittest
 
 
@@ -9,6 +9,11 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(net._dependants, [])
         self.assertEqual(net._previous_state, {})
         self.assertEqual(net._current_state, {})
+        self.assertIsInstance(net.id, int)
+        self.assertIs(networks[net.id](), net)
+        net = Network(nid=1024)
+        self.assertEqual(net.id, 1024)
+        self.assertIs(networks[1024](), net)
 
     def test_get_signal(self):
         net = Network()

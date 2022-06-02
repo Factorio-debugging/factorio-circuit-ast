@@ -1,17 +1,23 @@
+from __future__ import annotations
 from weakref import ref, ReferenceType
 
-from typing import List
+from typing import List, Dict, Optional
 
 from .ASTNode import ASTNode, Signals
 from .Signal import Signal
 
 
+networks: Dict[int, ReferenceType[Network]] = {}
+
+
 class Network:
-    def __init__(self) -> None:
+    def __init__(self, nid: Optional[int] = None) -> None:
         self._depends: List[ReferenceType[ASTNode]] = []
         self._dependants: List[ReferenceType[ASTNode]] = []
         self._previous_state: Signals = {}
         self._current_state: Signals = {}
+        self.id = nid if nid is not None else max([*networks.keys(), 0]) + 1
+        networks[self.id] = ref(self)
 
     def depends_on(self, node: ASTNode) -> None:
         self._depends.append(ref(node))
