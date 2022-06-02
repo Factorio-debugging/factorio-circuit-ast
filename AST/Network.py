@@ -28,6 +28,9 @@ class Network:
     def get_signal_value(self, signal: Signal) -> int:
         return self._previous_state.setdefault(signal, 0)
 
+    def get_all_values(self) -> Signals:
+        return self._previous_state
+
     def tick(self) -> None:
         self._previous_state = self._current_state
         self._current_state = {}

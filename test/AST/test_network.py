@@ -44,3 +44,13 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 30)
         self.assertEqual(net.get_signal_value(Signal.ADVANCED_CIRCUIT), 500)
 
+    def test_get_all_values(self):
+        net = Network()
+        self.assertEqual(net.get_all_values(), {})
+        net.update_value(Signal.SIGNAL_A, 10)
+        net.update_value(Signal.SIGNAL_B, 30)
+        self.assertEqual(net.get_all_values(), {})
+        net.tick()
+        self.assertEqual(net.get_all_values(), {Signal.SIGNAL_A: 10, Signal.SIGNAL_B: 30})
+        net.tick()
+        self.assertEqual(net.get_all_values(), {})
