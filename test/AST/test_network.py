@@ -18,6 +18,8 @@ class TestNetwork(unittest.TestCase):
     def test_get_signal(self):
         net = Network()
         self.assertEqual(net.get_signal_value(Signal.ADVANCED_CIRCUIT), 0)
+        with self.assertRaises(AssertionError):
+            net.get_signal_value(Signal.SIGNAL_ANYTHING)
 
     def test_tick(self):
         net = Network()
@@ -28,6 +30,8 @@ class TestNetwork(unittest.TestCase):
     def test_update_value(self):
         net = Network()
         net.update_value(Signal.SIGNAL_A, np.int32(10))
+        with self.assertRaises(AssertionError):
+            net.update_value(Signal.SIGNAL_EVERYTHING, np.int32(0))
         self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 0)
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 10)
         net.tick()
@@ -43,6 +47,10 @@ class TestNetwork(unittest.TestCase):
         net.tick()
         self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 30)
         self.assertEqual(net.get_signal_value(Signal.ADVANCED_CIRCUIT), 500)
+        net.update_value(Signal.SIGNAL_A, np.int32(2**31 - 1))
+        net.update_value(Signal.SIGNAL_A, np.int32(1))
+        net.tick()
+        self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), -(2**31))
 
     def test_get_all_values(self):
         net = Network()
