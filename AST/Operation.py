@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Any, Dict
+from typing import Optional, Any
 
 import numpy as np
 
@@ -65,7 +65,6 @@ class Operation(ASTNode):
         self.result = result
         self.left = self._left
         self.right = self._right
-        self.previous_result: Optional[Signals] = None
 
     def tick(self) -> None:
         results: Signals = {}
