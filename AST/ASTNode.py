@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import Dict
 
 import numpy as np
-from typing import Dict
 
 from .Signal import Signal
 
@@ -13,5 +13,5 @@ class ASTNode(ABC):
         self.name: str = name
 
     @abstractmethod
-    def output(self) -> Signals:
+    def tick(self) -> None:
         raise NotImplementedError
