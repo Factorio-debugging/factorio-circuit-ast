@@ -86,21 +86,18 @@ class Operation(ASTNode):
 
     @left.setter
     def left(self, left: Operand) -> None:
-        if isinstance(left, SignalOperand):
-            if left.signal == Signal.SIGNAL_EACH:
-                if isinstance(self.right, SignalOperand):
-                    assert (
-                        self.right.signal != Signal.SIGNAL_EACH
-                    ), "Only one operand for Operation may be Each"
-            else:
-                assert (
-                    left.signal in ConcreteSignal
-                ), "Only concrete signals or Each are allowed in Operation"
-                assert (
-                    self.result.signal != Signal.SIGNAL_EACH
-                    or isinstance(self.right, SignalOperand)
-                    and self.right.signal == Signal.SIGNAL_EACH
-                ), "Can not assign signal other than each to Operation while having result each"
+        if left.is_each():
+            assert (
+                not self.right.is_each()
+            ), "Only one operand for Operation may be Each"
+        elif left.abstract():
+            raise AssertionError(
+                "Only concrete signals or Each are allowed in Operation"
+            )
+        else:
+            assert (
+                not self.result.is_each() or self.right.is_each()
+            ), "Can not assign signal other than each to Operation while having result each"
         self._left = left
 
     @property
@@ -109,20 +106,15 @@ class Operation(ASTNode):
 
     @right.setter
     def right(self, right: Operand) -> None:
-        if isinstance(right, SignalOperand):
-            if right.signal == Signal.SIGNAL_EACH:
-                if isinstance(self.left, SignalOperand):
-                    assert (
-                        self.left.signal != Signal.SIGNAL_EACH
-                    ), "Only one operand for Operation may be Each"
-            else:
-                assert (
-                    right.signal in ConcreteSignal
-                ), "Only concrete signals or Each are allowed in Operation"
+        if right.is_each():
+            assert not self.left.is_each(), "Only one operand for Operation may be Each"
+        elif right.abstract():
+            raise AssertionError(
+                "Only concrete signals or Each are allowed in Operation"
+            )
+        else:
             assert (
-                self.result.signal != Signal.SIGNAL_EACH
-                or isinstance(self.left, SignalOperand)
-                and self.left.signal == Signal.SIGNAL_EACH
+                not self.result.is_each() or self.left.is_each()
             ), "Can not assign signal other than each to Operation while having result each"
         self._right = right
 
@@ -136,11 +128,8 @@ class Operation(ASTNode):
             Signal.SIGNAL_EVERYTHING,
             Signal.SIGNAL_ANYTHING,
         ), "Anything or Everything are not allowed as Operation results"
-        if op.signal == Signal.SIGNAL_EACH:
+        if op.is_each():
             assert (
-                isinstance(self.left, SignalOperand)
-                and self.left.signal == Signal.SIGNAL_EACH
-                or isinstance(self.right, SignalOperand)
-                and self.right.signal == Signal.SIGNAL_EACH
+                self.left.is_each() or self.right.is_each()
             ), "Need to have one Operand as Each in order to set result to each"
         self._result = op
