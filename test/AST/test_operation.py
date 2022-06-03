@@ -1,7 +1,65 @@
 import unittest
 
-from AST.Operation import *
 from AST.Network import Network
+from AST.Operation import *
+
+
+class TestNumericOperator(unittest.TestCase):
+    def test_add(self):
+        self.assertEqual(NumericOperator.ADD.calculate(np.int32(1), np.int32(2)), 3)
+        self.assertEqual(
+            NumericOperator.ADD.calculate(np.int32(2**31 - 1), np.int32(1)),
+            -(2**31),
+        )
+
+    def test_subtract(self):
+        self.assertEqual(
+            NumericOperator.SUBTRACT.calculate(np.int32(2), np.int32(1)), 1
+        )
+        self.assertEqual(
+            NumericOperator.SUBTRACT.calculate(np.int32(1), np.int32(2)), -1
+        )
+
+    def test_multiply(self):
+        self.assertEqual(
+            NumericOperator.MULTIPLY.calculate(np.int32(9), np.int32(9)), 81
+        )
+
+    def test_divide(self):
+        self.assertEqual(NumericOperator.DIVIDE.calculate(np.int32(10), np.int32(2)), 5)
+        self.assertEqual(
+            NumericOperator.DIVIDE.calculate(np.int32(10), np.int32(11)), 0
+        )
+
+    def test_modulo(self):
+        self.assertEqual(
+            NumericOperator.MODULO.calculate(np.int32(10), np.int32(11)), 10
+        )
+        self.assertEqual(NumericOperator.MODULO.calculate(np.int32(10), np.int32(5)), 0)
+
+    def test_exponent(self):
+        self.assertEqual(
+            NumericOperator.EXPONENT.calculate(np.int32(2), np.int32(31)), -(2**31)
+        )
+
+    def test_left_bit_shift(self):
+        self.assertEqual(
+            NumericOperator.LEFT_BIT_SHIFT.calculate(np.int32(8), np.int32(3)), 64
+        )
+
+    def test_right_bit_shift(self):
+        self.assertEqual(
+            NumericOperator.RIGHT_BIT_SHIFT.calculate(np.int32(8), np.int32(3)), 1
+        )
+
+    def test_and(self):
+        self.assertEqual(NumericOperator.AND.calculate(np.int32(15), np.int32(22)), 6)
+
+    def test_or(self):
+        self.assertEqual(NumericOperator.OR.calculate(np.int32(15), np.int32(22)), 31)
+
+    def test_xor(self):
+        self.assertEqual(NumericOperator.XOR.calculate(np.int32(15), np.int32(22)), 25)
 
 
 class TestOperation(unittest.TestCase):
