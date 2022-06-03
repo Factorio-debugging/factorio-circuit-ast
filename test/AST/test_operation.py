@@ -160,3 +160,63 @@ class TestOperation(unittest.TestCase):
             op.result = SignalOperand(net, Signal.SIGNAL_EVERYTHING)
         with self.assertRaises(AssertionError):
             op.result = SignalOperand(net, Signal.SIGNAL_ANYTHING)
+
+    def test_tick_constant(self):
+        net = Network()
+        op = Operation(
+            NumericOperator.ADD,
+            SignalOperand(net, Signal.SIGNAL_A),
+            ConstantOperand(np.int32(10)),
+            ConstantOperand(np.int32(10)),
+        )
+        op.tick()
+        net.tick()
+        self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 20)
+
+    def test_tick_left_each_and_output_each(self):
+        out_net = Network()
+        left_net = Network()
+        op = Operation(
+            NumericOperator.ADD,
+            SignalOperand(out_net, Signal.SIGNAL_EACH),
+            SignalOperand(left_net, Signal.SIGNAL_EACH),
+            ConstantOperand(np.int32(10)),
+        )
+        left_net.update_value(Signal.WATER, np.int32(10))
+        left_net.update_value(Signal.SIGNAL_RED, np.int32(20))
+        left_net.tick()
+        op.tick()
+        out_net.tick()
+        self.assertEqual(
+            out_net.get_all_values(), {Signal.WATER: 20, Signal.SIGNAL_RED: 30}
+        )
+
+    def test_tick_right_each_and_output_each(self):
+        out_net = Network()
+        right_net = Network()
+        op = Operation(
+            NumericOperator.ADD,
+            SignalOperand(out_net, Signal.SIGNAL_EACH),
+            ConstantOperand(np.int32(10)),
+            SignalOperand(right_net, Signal.SIGNAL_EACH),
+        )
+        right_net.update_value(Signal.WATER, np.int32(10))
+        right_net.update_value(Signal.SIGNAL_RED, np.int32(20))
+        right_net.tick()
+        op.tick()
+        out_net.tick()
+        self.assertEqual(
+            out_net.get_all_values(), {Signal.WATER: 20, Signal.SIGNAL_RED: 30}
+        )
+
+    def test_tick_no_each_and_output_each(self):
+        net = Network()
+        op = Operation(
+            NumericOperator.ADD,
+            SignalOperand(net, Signal.SIGNAL_CYAN),
+            ConstantOperand(np.int32(10)),
+            ConstantOperand(np.int32(10)),
+        )
+        op.result.signal = Signal.SIGNAL_EACH
+        with self.assertRaises(AssertionError):
+            op.tick()

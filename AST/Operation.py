@@ -1,11 +1,11 @@
 from enum import Enum
-
-import numpy as np
 from typing import Optional, Any
 
-from .ASTNode import ASTNode, Signals
+import numpy as np
+
+from .ASTNode import ASTNode
 from .Operand import Operand, ConstantOperand, SignalOperand
-from .Signal import Signal, ConcreteSignal
+from .Signal import Signal
 
 
 class NumericOperator(Enum):
@@ -66,8 +66,34 @@ class Operation(ASTNode):
         self.left = self._left
         self.right = self._right
 
-    def output(self) -> Signals:
-        raise NotImplementedError("")
+    def tick(self) -> None:
+        if not (self.left.is_each() or self.right.is_each()):
+            self.result.update_self(
+                self.operation.calculate(self.left.value(), self.right.value())
+            )
+        else:
+            assert (result_net := self.result.network)
+            if self.result.is_each():
+                if self.left.is_each():
+                    assert isinstance(self.left, SignalOperand) and (
+                        left_net := self.left.network
+                    )
+                    for signal, value in left_net.get_all_values().items():
+                        result_net.update_value(
+                            signal, self.operation.calculate(value, self.right.value())
+                        )
+                elif self.right.is_each():
+                    assert isinstance(self.right, SignalOperand) and (
+                        right_net := self.right.network
+                    )
+                    for signal, value in right_net.get_all_values().items():
+                        result_net.update_value(
+                            signal, self.operation.calculate(self.left.value(), value)
+                        )
+                else:
+                    raise AssertionError(
+                        "result is each, but neither left nor right are each"
+                    )
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Operation):
