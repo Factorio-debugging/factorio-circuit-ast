@@ -30,6 +30,9 @@ class TestSignalOperand(unittest.TestCase):
         net.update_value(Signal.SIGNAL_B, np.int32(10))
         net.tick()
         self.assertEqual(op.value(), 0)
+        op.signal = Signal.SIGNAL_EACH
+        with self.assertRaises(AssertionError):
+            op.value()
 
     def test_eq(self):
         net = Network()
