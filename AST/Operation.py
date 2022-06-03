@@ -3,7 +3,7 @@ from typing import Optional, Any, Dict
 
 import numpy as np
 
-from .ASTNode import ASTNode
+from .ASTNode import ASTNode, Signals
 from .Operand import Operand, ConstantOperand, SignalOperand
 from .Signal import Signal
 
@@ -65,14 +65,15 @@ class Operation(ASTNode):
         self.result = result
         self.left = self._left
         self.right = self._right
+        self.previous_result: Optional[Signals] = None
 
     def tick(self) -> None:
+        results: Signals = {}
         if not (self.left.is_each() or self.right.is_each()):
-            self.result.update_self(
-                self.operation.calculate(self.left.value(), self.right.value())
+            results[self.result.signal] = self.operation.calculate(
+                self.left.value(), self.right.value()
             )
         else:
-            results: Dict[Signal, np.int32] = {}
             if self.left.is_each():
                 assert isinstance(self.left, SignalOperand) and (
                     left_net := self.left.network
@@ -91,12 +92,13 @@ class Operation(ASTNode):
                 raise AssertionError(
                     "result is each, but neither left nor right are each"
                 )
-            assert (result_net := self.result.network)
-            if self.result.is_each():
-                for signal, value in results.items():
-                    result_net.update_value(signal, value)
-            else:
-                self.result.update_self(np.sum([*results.values()], dtype=np.int32))
+        assert (result_net := self.result.network)
+        if self.result.is_each():
+            for signal, value in results.items():
+                result_net.update_value(signal, value)
+        else:
+            self.result.update_self(np.sum([*results.values()], dtype=np.int32))
+        self.previous_result = results
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Operation):

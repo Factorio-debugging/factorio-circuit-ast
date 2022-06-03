@@ -70,6 +70,7 @@ class TestOperation(unittest.TestCase):
         self.assertEqual(op.left, ConstantOperand(np.int32(0)))
         self.assertEqual(op.right, ConstantOperand(np.int32(0)))
         self.assertEqual(op.result, SignalOperand(net, Signal.SIGNAL_A))
+        self.assertIsNone(op.previous_result)
         op = Operation(
             NumericOperator.ADD,
             SignalOperand(net, Signal.SIGNAL_RED),
@@ -172,6 +173,7 @@ class TestOperation(unittest.TestCase):
         op.tick()
         net.tick()
         self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 20)
+        self.assertEqual(op.previous_result, {Signal.SIGNAL_A: 20})
 
     def test_tick_left_each_and_output_each(self):
         out_net = Network()
