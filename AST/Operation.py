@@ -57,12 +57,14 @@ class Operation(ASTNode):
     ):
         super().__init__("Operation")
         self.operation: NumericOperator = operation
-        self._left: Operand
-        self._right: Operand
-        self._result: SignalOperand
+        # set these for comparison
+        self._left: Operand = left if left else ConstantOperand(np.int32(0))
+        self._right: Operand = right if right else ConstantOperand(np.int32(0))
+        self._result: SignalOperand = result
+        # and set them with checks
         self.result = result
-        self.left = left if left else ConstantOperand(np.int32(0))
-        self.right = right if right else ConstantOperand(np.int32(0))
+        self.left = self._left
+        self.right = self._right
 
     def output(self) -> Signals:
         raise NotImplementedError("")

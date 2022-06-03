@@ -70,6 +70,22 @@ class TestOperation(unittest.TestCase):
         self.assertEqual(op.left, ConstantOperand(np.int32(0)))
         self.assertEqual(op.right, ConstantOperand(np.int32(0)))
         self.assertEqual(op.result, SignalOperand(net, Signal.SIGNAL_A))
+        op = Operation(
+            NumericOperator.ADD,
+            SignalOperand(net, Signal.SIGNAL_RED),
+            SignalOperand(net, Signal.SIGNAL_EACH),
+            SignalOperand(net, Signal.SIGNAL_CYAN),
+        )
+        self.assertEqual(op.left, SignalOperand(net, Signal.SIGNAL_EACH))
+        self.assertEqual(op.right, SignalOperand(net, Signal.SIGNAL_CYAN))
+        op = Operation(
+            NumericOperator.ADD,
+            SignalOperand(net, Signal.SIGNAL_RED),
+            ConstantOperand(np.int32(10)),
+            ConstantOperand(np.int32(20)),
+        )
+        self.assertEqual(op.left, ConstantOperand(np.int32(10)))
+        self.assertEqual(op.right, ConstantOperand(np.int32(20)))
 
     def test_eq(self):
         net = Network()
