@@ -96,6 +96,19 @@ class TestSignalOperand(unittest.TestCase):
         op.signal = Signal.WATER
         self.assertEqual(op.is_everything(), False)
 
+    def test_update_self(self):
+        net = Network()
+        op = SignalOperand(net, Signal.SIGNAL_EVERYTHING)
+        with self.assertRaises(AssertionError):
+            op.update_self(np.int32(10))
+        op.signal = Signal.WATER
+        op.update_self(np.int32(10))
+        net.tick()
+        self.assertEqual(net.get_signal_value(Signal.WATER), 10)
+        del net
+        with self.assertRaises(RuntimeError):
+            op.update_self(np.int32(10))
+
 
 class TestConstantOperand(unittest.TestCase):
     def test_constructo(self):

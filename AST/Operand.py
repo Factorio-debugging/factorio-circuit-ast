@@ -52,6 +52,15 @@ class SignalOperand(Operand):
     def is_everything(self) -> bool:
         return self.signal == Signal.SIGNAL_EVERYTHING
 
+    def update_self(self, value: np.int32) -> None:
+        assert (
+            self.signal not in AbstractSignal
+        ), "Can not use update self on abstract signals"
+        if network := self.network:
+            network.update_value(self.signal, value)
+        else:
+            raise RuntimeError("Network belonging to signal has been destroyed")
+
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, SignalOperand):
             return self.network == other.network and self.signal == other.signal
