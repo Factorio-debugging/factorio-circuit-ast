@@ -44,6 +44,58 @@ class TestSignalOperand(unittest.TestCase):
         op1.network = net
         self.assertEqual(op1, op2)
 
+    def test_abstract(self):
+        net = Network()
+        op = SignalOperand(net, Signal.SIGNAL_A)
+        self.assertEqual(op.abstract(), False)
+        op.signal = Signal.SIGNAL_EACH
+        self.assertEqual(op.abstract(), True)
+        op.signal = Signal.SIGNAL_EVERYTHING
+        self.assertEqual(op.abstract(), True)
+        op.signal = Signal.SIGNAL_ANYTHING
+        self.assertEqual(op.abstract(), True)
+        op.signal = Signal.WATER
+        self.assertEqual(op.abstract(), False)
+
+    def test_each(self):
+        net = Network()
+        op = SignalOperand(net, Signal.SIGNAL_A)
+        self.assertEqual(op.is_each(), False)
+        op.signal = Signal.SIGNAL_EACH
+        self.assertEqual(op.is_each(), True)
+        op.signal = Signal.SIGNAL_EVERYTHING
+        self.assertEqual(op.is_each(), False)
+        op.signal = Signal.SIGNAL_ANYTHING
+        self.assertEqual(op.is_each(), False)
+        op.signal = Signal.WATER
+        self.assertEqual(op.is_each(), False)
+
+    def test_anything(self):
+        net = Network()
+        op = SignalOperand(net, Signal.SIGNAL_A)
+        self.assertEqual(op.is_anything(), False)
+        op.signal = Signal.SIGNAL_EACH
+        self.assertEqual(op.is_anything(), False)
+        op.signal = Signal.SIGNAL_EVERYTHING
+        self.assertEqual(op.is_anything(), False)
+        op.signal = Signal.SIGNAL_ANYTHING
+        self.assertEqual(op.is_anything(), True)
+        op.signal = Signal.WATER
+        self.assertEqual(op.is_anything(), False)
+
+    def test_everything(self):
+        net = Network()
+        op = SignalOperand(net, Signal.SIGNAL_A)
+        self.assertEqual(op.is_everything(), False)
+        op.signal = Signal.SIGNAL_EACH
+        self.assertEqual(op.is_everything(), False)
+        op.signal = Signal.SIGNAL_EVERYTHING
+        self.assertEqual(op.is_everything(), True)
+        op.signal = Signal.SIGNAL_ANYTHING
+        self.assertEqual(op.is_everything(), False)
+        op.signal = Signal.WATER
+        self.assertEqual(op.is_everything(), False)
+
 
 class TestConstantOperand(unittest.TestCase):
     def test_constructo(self):
@@ -62,3 +114,19 @@ class TestConstantOperand(unittest.TestCase):
         self.assertNotEqual(op1, op3)
         op2.constant = 10
         self.assertEqual(op1, op2)
+
+    def test_abstract(self):
+        op = ConstantOperand(np.int32(12))
+        self.assertEqual(op.abstract(), False)
+
+    def test_each(self):
+        op = ConstantOperand(np.int32(12))
+        self.assertEqual(op.is_each(), False)
+
+    def test_anything(self):
+        op = ConstantOperand(np.int32(12))
+        self.assertEqual(op.is_anything(), False)
+
+    def test_everything(self):
+        op = ConstantOperand(np.int32(12))
+        self.assertEqual(op.is_everything(), False)

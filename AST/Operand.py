@@ -1,16 +1,32 @@
 from abc import ABC, abstractmethod
+from typing import Any, Optional
 from weakref import ref, ReferenceType
 
 import numpy as np
-from typing import Any, Optional
 
 from .Network import Network
-from .Signal import Signal
+from .Signal import Signal, AbstractSignal
 
 
 class Operand(ABC):
     @abstractmethod
     def value(self) -> np.int32:
+        raise NotImplementedError
+
+    @abstractmethod
+    def abstract(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def is_each(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def is_anything(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def is_everything(self) -> bool:
         raise NotImplementedError
 
 
@@ -23,6 +39,18 @@ class SignalOperand(Operand):
         if network := self.network:
             return network.get_signal_value(self.signal)
         raise RuntimeError("Network belonging to signal has been destroyed")
+
+    def abstract(self) -> bool:
+        return self.signal in AbstractSignal
+
+    def is_each(self) -> bool:
+        return self.signal == Signal.SIGNAL_EACH
+
+    def is_anything(self) -> bool:
+        return self.signal == Signal.SIGNAL_ANYTHING
+
+    def is_everything(self) -> bool:
+        return self.signal == Signal.SIGNAL_EVERYTHING
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, SignalOperand):
@@ -47,6 +75,18 @@ class ConstantOperand(Operand):
 
     def value(self) -> np.int32:
         return self.constant
+
+    def abstract(self) -> bool:
+        return False
+
+    def is_each(self) -> bool:
+        return False
+
+    def is_anything(self) -> bool:
+        return False
+
+    def is_everything(self) -> bool:
+        return False
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, ConstantOperand):
