@@ -252,4 +252,3 @@ class TestOperation(unittest.TestCase):
         op.tick()
         out_net.tick()
         self.assertEqual(out_net.get_signal_value(Signal.SIGNAL_WHITE), 50)
-

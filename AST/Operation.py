@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
 import numpy as np
 
@@ -72,28 +72,31 @@ class Operation(ASTNode):
                 self.operation.calculate(self.left.value(), self.right.value())
             )
         else:
+            results: Dict[Signal, np.int32] = {}
+            if self.left.is_each():
+                assert isinstance(self.left, SignalOperand) and (
+                    left_net := self.left.network
+                )
+                for signal, value in left_net.get_all_values().items():
+                    results[signal] = self.operation.calculate(
+                        value, self.right.value()
+                    )
+            elif self.right.is_each():
+                assert isinstance(self.right, SignalOperand) and (
+                    right_net := self.right.network
+                )
+                for signal, value in right_net.get_all_values().items():
+                    results[signal] = self.operation.calculate(self.left.value(), value)
+            else:
+                raise AssertionError(
+                    "result is each, but neither left nor right are each"
+                )
             assert (result_net := self.result.network)
             if self.result.is_each():
-                if self.left.is_each():
-                    assert isinstance(self.left, SignalOperand) and (
-                        left_net := self.left.network
-                    )
-                    for signal, value in left_net.get_all_values().items():
-                        result_net.update_value(
-                            signal, self.operation.calculate(value, self.right.value())
-                        )
-                elif self.right.is_each():
-                    assert isinstance(self.right, SignalOperand) and (
-                        right_net := self.right.network
-                    )
-                    for signal, value in right_net.get_all_values().items():
-                        result_net.update_value(
-                            signal, self.operation.calculate(self.left.value(), value)
-                        )
-                else:
-                    raise AssertionError(
-                        "result is each, but neither left nor right are each"
-                    )
+                for signal, value in results.items():
+                    result_net.update_value(signal, value)
+            else:
+                self.result.update_self(np.sum([*results.values()], dtype=np.int32))
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Operation):
