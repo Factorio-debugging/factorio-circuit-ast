@@ -1,6 +1,7 @@
 import unittest
 
 from AST.DoubleNetwork import *
+from AST.Signal import Signals
 
 
 class TestDoubleNetwork(unittest.TestCase):

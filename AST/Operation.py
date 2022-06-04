@@ -3,9 +3,9 @@ from typing import Optional, Any
 
 import numpy as np
 
-from .ASTNode import ASTNode, Signals
+from .ASTNode import ASTNode
 from .Operand import Operand, ConstantOperand, SignalOperand
-from .Signal import Signal
+from .Signal import Signal, Signals
 
 
 class NumericOperator(Enum):

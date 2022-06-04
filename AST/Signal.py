@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 from enum import Enum
-from typing import List
+from typing import List, Dict
+
+import numpy as np
 
 
 class Signal(Enum):
@@ -276,3 +280,5 @@ AbstractSignal: List[Signal] = [
 ConcreteSignal: List[Signal] = [
     signal for signal in Signal.__members__.values() if signal not in AbstractSignal
 ]
+
+Signals = Dict[Signal, np.int32]

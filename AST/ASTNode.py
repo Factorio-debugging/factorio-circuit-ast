@@ -1,11 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
+from typing import Optional
 
-import numpy as np
-
-from .Signal import Signal
-
-Signals = Dict[Signal, np.int32]
+from .Signal import Signals
 
 
 class ASTNode(ABC):

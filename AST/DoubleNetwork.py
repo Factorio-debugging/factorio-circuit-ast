@@ -2,9 +2,8 @@ from typing import Optional
 
 import numpy as np
 
-from .ASTNode import Signals
 from .Network import Network, NetworkType
-from .Signal import Signal, AbstractSignal
+from .Signal import Signal, AbstractSignal, Signals
 
 
 class DoubleNetwork:

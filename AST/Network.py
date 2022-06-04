@@ -6,8 +6,8 @@ from weakref import ref, ReferenceType
 
 import numpy as np
 
-from .ASTNode import ASTNode, Signals
-from .Signal import Signal, AbstractSignal
+from .ASTNode import ASTNode
+from .Signal import Signal, AbstractSignal, Signals
 
 networks: Dict[int, ReferenceType[Network]] = {}
 
