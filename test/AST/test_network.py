@@ -50,10 +50,10 @@ class TestNetwork(unittest.TestCase):
         net.tick()
         self.assertEqual(net.get_signal(Signal.SIGNAL_A), 30)
         self.assertEqual(net.get_signal(Signal.ADVANCED_CIRCUIT), 500)
-        net.update_signal(Signal.SIGNAL_A, np.int32(2 ** 31 - 1))
+        net.update_signal(Signal.SIGNAL_A, np.int32(2**31 - 1))
         net.update_signal(Signal.SIGNAL_A, np.int32(1))
         net.tick()
-        self.assertEqual(net.get_signal(Signal.SIGNAL_A), -(2 ** 31))
+        self.assertEqual(net.get_signal(Signal.SIGNAL_A), -(2**31))
         self.assertIsInstance(net.get_signal(Signal.SIGNAL_A), np.int32)
 
     def test_get_signals(self):
@@ -63,9 +63,7 @@ class TestNetwork(unittest.TestCase):
         net.update_signal(Signal.SIGNAL_B, np.int32(30))
         self.assertEqual(net.get_signals(), {})
         net.tick()
-        self.assertEqual(
-            net.get_signals(), {Signal.SIGNAL_A: 10, Signal.SIGNAL_B: 30}
-        )
+        self.assertEqual(net.get_signals(), {Signal.SIGNAL_A: 10, Signal.SIGNAL_B: 30})
         self.assertTrue(
             all(isinstance(i, np.int32) for i in net.get_signals().values())
         )
