@@ -1,18 +1,27 @@
 from __future__ import annotations
+
+from enum import Enum
+from typing import List, Dict, Optional
 from weakref import ref, ReferenceType
 
 import numpy as np
-from typing import List, Dict, Optional
 
 from .ASTNode import ASTNode, Signals
 from .Signal import Signal, AbstractSignal
 
-
 networks: Dict[int, ReferenceType[Network]] = {}
 
 
+class NetworkType(Enum):
+    RED = "red"
+    GREEN = "green"
+
+
 class Network:
-    def __init__(self, nid: Optional[int] = None) -> None:
+    def __init__(
+        self, nid: Optional[int] = None, network: Optional[NetworkType] = None
+    ) -> None:
+        self.type: NetworkType = network if network else NetworkType.RED
         self._depends: List[ReferenceType[ASTNode]] = []
         self._dependants: List[ReferenceType[ASTNode]] = []
         self._previous_state: Signals = {}
@@ -46,6 +55,14 @@ class Network:
         self._current_state[signal] = (
             self._current_state.setdefault(signal, np.int32(0)) + value
         )
+
+    def update_signals(self, values: Signals) -> None:
+        assert (
+            Signal.SIGNAL_EACH not in values
+            and Signal.SIGNAL_EVERYTHING not in values
+            and Signal.SIGNAL_ANYTHING not in values
+        ), "only concrete signals are allowed in update_values"
+        self._current_state.update(values)
 
     @property
     def depends(self) -> List[ReferenceType[ASTNode]]:

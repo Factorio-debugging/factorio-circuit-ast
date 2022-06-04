@@ -1,5 +1,6 @@
-from AST.Network import *
 import unittest
+
+from AST.Network import *
 
 
 class TestNetwork(unittest.TestCase):
@@ -11,9 +12,11 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(net._current_state, {})
         self.assertIsInstance(net.id, int)
         self.assertIs(networks[net.id](), net)
-        net = Network(nid=1024)
+        self.assertEqual(net.type, NetworkType.RED)
+        net = Network(nid=1024, network=NetworkType.GREEN)
         self.assertEqual(net.id, 1024)
         self.assertIs(networks[1024](), net)
+        self.assertEqual(net.type, NetworkType.GREEN)
 
     def test_get_signal(self):
         net = Network()
@@ -67,4 +70,21 @@ class TestNetwork(unittest.TestCase):
             all(isinstance(i, np.int32) for i in net.get_signals().values())
         )
         net.tick()
-        self.assertEqual(net.get_all_values(), {})
+        self.assertEqual(net.get_signals(), {})
+
+    def test_update_signals(self):
+        net = Network()
+        with self.assertRaises(AssertionError):
+            net.update_signals({Signal.SIGNAL_EACH: 10})
+        with self.assertRaises(AssertionError):
+            net.update_signals({Signal.SIGNAL_EVERYTHING: 10})
+        with self.assertRaises(AssertionError):
+            net.update_signals({Signal.SIGNAL_ANYTHING: 10})
+        values: Signals = {
+            Signal.SIGNAL_A: 20,
+            Signal.SIGNAL_B: 50,
+        }
+        net.update_signals(values)
+        self.assertEqual(net.get_signals(), {})
+        net.tick()
+        self.assertEqual(net.get_signals(), values)
