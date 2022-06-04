@@ -38,7 +38,7 @@ class Network:
     def get_signal(self, signal: Signal) -> np.int32:
         assert (
             signal not in AbstractSignal
-        ), f"only concrete signals are allowed in get_signal_value, got {signal}"
+        ), f"only concrete signals are allowed in get_signal, got {signal}"
         return self._previous_state.setdefault(signal, np.int32(0))
 
     def get_signals(self) -> Signals:
@@ -51,18 +51,18 @@ class Network:
     def update_signal(self, signal: Signal, value: np.int32) -> None:
         assert (
             signal not in AbstractSignal
-        ), f"only concrete signals are allowed in update_value, got {signal}"
+        ), f"only concrete signals are allowed in update_signal, got {signal}"
         self._current_state[signal] = (
             self._current_state.setdefault(signal, np.int32(0)) + value
         )
 
-    def update_signals(self, values: Signals) -> None:
+    def update_signals(self, signals: Signals) -> None:
         assert (
-            Signal.SIGNAL_EACH not in values
-            and Signal.SIGNAL_EVERYTHING not in values
-            and Signal.SIGNAL_ANYTHING not in values
-        ), "only concrete signals are allowed in update_values"
-        self._current_state.update(values)
+            Signal.SIGNAL_EACH not in signals
+            and Signal.SIGNAL_EVERYTHING not in signals
+            and Signal.SIGNAL_ANYTHING not in signals
+        ), "only concrete signals are allowed in update_signals"
+        self._current_state.update(signals)
 
     @property
     def depends(self) -> List[ReferenceType[ASTNode]]:
