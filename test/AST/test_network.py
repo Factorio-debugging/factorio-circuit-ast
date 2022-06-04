@@ -17,50 +17,54 @@ class TestNetwork(unittest.TestCase):
 
     def test_get_signal(self):
         net = Network()
-        self.assertEqual(net.get_signal_value(Signal.ADVANCED_CIRCUIT), 0)
+        self.assertEqual(net.get_signal(Signal.ADVANCED_CIRCUIT), 0)
         with self.assertRaises(AssertionError):
-            net.get_signal_value(Signal.SIGNAL_ANYTHING)
+            net.get_signal(Signal.SIGNAL_ANYTHING)
 
     def test_tick(self):
         net = Network()
         net._current_state[Signal.ADVANCED_CIRCUIT] = np.int32(10)
         net.tick()
-        self.assertEqual(net.get_signal_value(Signal.ADVANCED_CIRCUIT), 10)
+        self.assertEqual(net.get_signal(Signal.ADVANCED_CIRCUIT), 10)
 
-    def test_update_value(self):
+    def test_update_signal(self):
         net = Network()
-        net.update_value(Signal.SIGNAL_A, np.int32(10))
+        net.update_signal(Signal.SIGNAL_A, np.int32(10))
         with self.assertRaises(AssertionError):
-            net.update_value(Signal.SIGNAL_EVERYTHING, np.int32(0))
-        self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 0)
+            net.update_signal(Signal.SIGNAL_EVERYTHING, np.int32(0))
+        self.assertEqual(net.get_signal(Signal.SIGNAL_A), 0)
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 10)
         net.tick()
-        self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 10)
+        self.assertEqual(net.get_signal(Signal.SIGNAL_A), 10)
         self.assertNotIn(Signal.SIGNAL_A, net._current_state)
-        net.update_value(Signal.SIGNAL_A, np.int32(10))
+        net.update_signal(Signal.SIGNAL_A, np.int32(10))
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 10)
-        net.update_value(Signal.SIGNAL_A, np.int32(20))
+        net.update_signal(Signal.SIGNAL_A, np.int32(20))
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 30)
-        net.update_value(Signal.ADVANCED_CIRCUIT, np.int32(500))
+        net.update_signal(Signal.ADVANCED_CIRCUIT, np.int32(500))
         self.assertEqual(net._current_state[Signal.SIGNAL_A], 30)
         self.assertEqual(net._current_state[Signal.ADVANCED_CIRCUIT], 500)
         net.tick()
-        self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), 30)
-        self.assertEqual(net.get_signal_value(Signal.ADVANCED_CIRCUIT), 500)
-        net.update_value(Signal.SIGNAL_A, np.int32(2**31 - 1))
-        net.update_value(Signal.SIGNAL_A, np.int32(1))
+        self.assertEqual(net.get_signal(Signal.SIGNAL_A), 30)
+        self.assertEqual(net.get_signal(Signal.ADVANCED_CIRCUIT), 500)
+        net.update_signal(Signal.SIGNAL_A, np.int32(2 ** 31 - 1))
+        net.update_signal(Signal.SIGNAL_A, np.int32(1))
         net.tick()
-        self.assertEqual(net.get_signal_value(Signal.SIGNAL_A), -(2**31))
+        self.assertEqual(net.get_signal(Signal.SIGNAL_A), -(2 ** 31))
+        self.assertIsInstance(net.get_signal(Signal.SIGNAL_A), np.int32)
 
-    def test_get_all_values(self):
+    def test_get_signals(self):
         net = Network()
-        self.assertEqual(net.get_all_values(), {})
-        net.update_value(Signal.SIGNAL_A, np.int32(10))
-        net.update_value(Signal.SIGNAL_B, np.int32(30))
-        self.assertEqual(net.get_all_values(), {})
+        self.assertEqual(net.get_signals(), {})
+        net.update_signal(Signal.SIGNAL_A, np.int32(10))
+        net.update_signal(Signal.SIGNAL_B, np.int32(30))
+        self.assertEqual(net.get_signals(), {})
         net.tick()
         self.assertEqual(
-            net.get_all_values(), {Signal.SIGNAL_A: 10, Signal.SIGNAL_B: 30}
+            net.get_signals(), {Signal.SIGNAL_A: 10, Signal.SIGNAL_B: 30}
+        )
+        self.assertTrue(
+            all(isinstance(i, np.int32) for i in net.get_signals().values())
         )
         net.tick()
         self.assertEqual(net.get_all_values(), {})

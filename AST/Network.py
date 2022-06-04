@@ -26,20 +26,20 @@ class Network:
     def dependant_from(self, node: ASTNode) -> None:
         self._dependants.append(ref(node))
 
-    def get_signal_value(self, signal: Signal) -> np.int32:
+    def get_signal(self, signal: Signal) -> np.int32:
         assert (
             signal not in AbstractSignal
         ), f"only concrete signals are allowed in get_signal_value, got {signal}"
         return self._previous_state.setdefault(signal, np.int32(0))
 
-    def get_all_values(self) -> Signals:
+    def get_signals(self) -> Signals:
         return self._previous_state
 
     def tick(self) -> None:
         self._previous_state = self._current_state
         self._current_state = {}
 
-    def update_value(self, signal: Signal, value: np.int32) -> None:
+    def update_signal(self, signal: Signal, value: np.int32) -> None:
         assert (
             signal not in AbstractSignal
         ), f"only concrete signals are allowed in update_value, got {signal}"

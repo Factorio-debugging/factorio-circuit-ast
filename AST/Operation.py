@@ -77,7 +77,7 @@ class Operation(ASTNode):
                 assert isinstance(self.left, SignalOperand) and (
                     left_net := self.left.network
                 )
-                for signal, value in left_net.get_all_values().items():
+                for signal, value in left_net.get_signals().items():
                     results[signal] = self.operation.calculate(
                         value, self.right.value()
                     )
@@ -85,7 +85,7 @@ class Operation(ASTNode):
                 assert isinstance(self.right, SignalOperand) and (
                     right_net := self.right.network
                 )
-                for signal, value in right_net.get_all_values().items():
+                for signal, value in right_net.get_signals().items():
                     results[signal] = self.operation.calculate(self.left.value(), value)
             else:
                 raise AssertionError(
@@ -94,7 +94,7 @@ class Operation(ASTNode):
         assert (result_net := self.result.network)
         if self.result.is_each():
             for signal, value in results.items():
-                result_net.update_value(signal, value)
+                result_net.update_signal(signal, value)
         else:
             self.result.update_self(np.sum([*results.values()], dtype=np.int32))
         self.previous_result = results

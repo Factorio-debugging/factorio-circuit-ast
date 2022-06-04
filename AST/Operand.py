@@ -37,7 +37,7 @@ class SignalOperand(Operand):
 
     def value(self) -> np.int32:
         if network := self.network:
-            return network.get_signal_value(self.signal)
+            return network.get_signal(self.signal)
         raise RuntimeError("Network belonging to signal has been destroyed")
 
     def abstract(self) -> bool:
@@ -57,7 +57,7 @@ class SignalOperand(Operand):
             self.signal not in AbstractSignal
         ), "Can not use update self on abstract signals"
         if network := self.network:
-            network.update_value(self.signal, value)
+            network.update_signal(self.signal, value)
         else:
             raise RuntimeError("Network belonging to signal has been destroyed")
 

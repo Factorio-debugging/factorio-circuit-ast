@@ -24,10 +24,10 @@ class TestSignalOperand(unittest.TestCase):
         sig = Signal.SIGNAL_A
         op = SignalOperand(net, sig)
         self.assertEqual(op.value(), 0)
-        net.update_value(sig, np.int32(10))
+        net.update_signal(sig, np.int32(10))
         net.tick()
         self.assertEqual(op.value(), 10)
-        net.update_value(Signal.SIGNAL_B, np.int32(10))
+        net.update_signal(Signal.SIGNAL_B, np.int32(10))
         net.tick()
         self.assertEqual(op.value(), 0)
         op.signal = Signal.SIGNAL_EACH
@@ -107,7 +107,7 @@ class TestSignalOperand(unittest.TestCase):
         op.signal = Signal.WATER
         op.update_self(np.int32(10))
         net.tick()
-        self.assertEqual(net.get_signal_value(Signal.WATER), 10)
+        self.assertEqual(net.get_signal(Signal.WATER), 10)
         del net
         with self.assertRaises(RuntimeError):
             op.update_self(np.int32(10))
