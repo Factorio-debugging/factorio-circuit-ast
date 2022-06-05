@@ -68,3 +68,6 @@ class DoubleNetwork:
         if isinstance(other, DoubleNetwork):
             return self.red == other.red and self.green == other.green
         return False
+
+    def __repr__(self) -> str:
+        return f"DoubleNetwork(red={self.red!r}, green={self.green!r})"

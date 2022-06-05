@@ -71,3 +71,6 @@ class Network:
     @property
     def dependants(self) -> List[ReferenceType[ASTNode]]:
         return self._dependants
+
+    def __repr__(self) -> str:
+        return f"Network(nid={self.id!r}, network={self.type!r})"
