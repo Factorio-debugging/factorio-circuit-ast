@@ -1,6 +1,6 @@
 import unittest
 
-from AST.Network import Network
+from AST.Network import Network, NetworkType
 from AST.Operation import *
 
 
@@ -62,26 +62,40 @@ class TestNumericOperator(unittest.TestCase):
         self.assertEqual(NumericOperator.XOR.calculate(np.int32(15), np.int32(22)), 25)
 
 
+def get_nets() -> DoubleNetwork:
+    r_net = Network(network=NetworkType.RED)
+    g_net = Network(network=NetworkType.GREEN)
+    d_net = DoubleNetwork(r_net, g_net)
+    return d_net
+
+
 class TestOperation(unittest.TestCase):
     def test_constructor(self):
-        net = Network()
-        op = Operation(NumericOperator.OR, SignalOperand(net, Signal.SIGNAL_A))
+        i_net = get_nets()
+        o_net = get_nets()
+        op = Operation(NumericOperator.OR, SignalOperand(Signal.SIGNAL_A))
         self.assertEqual(op.operation, NumericOperator.OR)
         self.assertEqual(op.left, ConstantOperand(np.int32(0)))
         self.assertEqual(op.right, ConstantOperand(np.int32(0)))
-        self.assertEqual(op.result, SignalOperand(net, Signal.SIGNAL_A))
+        self.assertEqual(op.result, SignalOperand(Signal.SIGNAL_A))
         self.assertIsNone(op.previous_result)
         op = Operation(
             NumericOperator.ADD,
-            SignalOperand(net, Signal.SIGNAL_RED),
-            SignalOperand(net, Signal.SIGNAL_EACH),
-            SignalOperand(net, Signal.SIGNAL_CYAN),
+            SignalOperand(Signal.SIGNAL_RED),
+            o_net,
+            i_net,
+            SignalOperand(Signal.SIGNAL_EACH),
+            SignalOperand(Signal.SIGNAL_CYAN),
         )
-        self.assertEqual(op.left, SignalOperand(net, Signal.SIGNAL_EACH))
-        self.assertEqual(op.right, SignalOperand(net, Signal.SIGNAL_CYAN))
+        self.assertEqual(op.left, SignalOperand(Signal.SIGNAL_EACH))
+        self.assertEqual(op.right, SignalOperand(Signal.SIGNAL_CYAN))
+        self.assertEqual(op.input_network, i_net)
+        self.assertEqual(op.output_network, o_net)
         op = Operation(
             NumericOperator.ADD,
-            SignalOperand(net, Signal.SIGNAL_RED),
+            SignalOperand(Signal.SIGNAL_RED),
+            i_net,
+            o_net,
             ConstantOperand(np.int32(10)),
             ConstantOperand(np.int32(20)),
         )
@@ -89,9 +103,10 @@ class TestOperation(unittest.TestCase):
         self.assertEqual(op.right, ConstantOperand(np.int32(20)))
 
     def test_eq(self):
-        net = Network()
-        op1 = Operation(NumericOperator.OR, SignalOperand(net, Signal.SIGNAL_A))
-        op2 = Operation(NumericOperator.ADD, SignalOperand(net, Signal.SIGNAL_A))
+        i_net = get_nets()
+        o_net = get_nets()
+        op1 = Operation(NumericOperator.OR, SignalOperand(Signal.SIGNAL_A))
+        op2 = Operation(NumericOperator.ADD, SignalOperand(Signal.SIGNAL_A))
         self.assertNotEqual(op1, ConstantOperand(np.int32(2)))
         self.assertNotEqual(op1, op2)
         op2.operation = NumericOperator.OR
@@ -101,156 +116,174 @@ class TestOperation(unittest.TestCase):
         op2.right = ConstantOperand(np.int32(50))
         self.assertNotEqual(op1, op2)
         op2.right = ConstantOperand(np.int32(0))
-        op1.result = SignalOperand(net, Signal.SIGNAL_B)
+        op1.result = SignalOperand(Signal.SIGNAL_B)
         self.assertNotEqual(op1, op2)
-        op1.result = SignalOperand(net, Signal.SIGNAL_A)
+        op1.result = SignalOperand(Signal.SIGNAL_A)
+        op2.output_network = o_net
+        self.assertNotEqual(op1, op2)
+        op1.output_network = o_net
+        op1.input_network = i_net
+        self.assertNotEqual(op1, op2)
+        op2.input_network = i_net
         self.assertEqual(op1, op2)
 
     def test_set_left(self):
-        net = Network()
-        op = Operation(NumericOperator.ADD, SignalOperand(net, Signal.SIGNAL_A))
-        op.right = SignalOperand(net, Signal.SIGNAL_EACH)
+        op = Operation(NumericOperator.ADD, SignalOperand(Signal.SIGNAL_A))
         with self.assertRaises(AssertionError):
-            op.left = SignalOperand(net, Signal.SIGNAL_EACH)
+            op.left = SignalOperand(Signal.SIGNAL_A)
+        i_net = get_nets()
+        op.input_network = i_net
+        op.right = SignalOperand(Signal.SIGNAL_EACH)
         with self.assertRaises(AssertionError):
-            op.left = SignalOperand(net, Signal.SIGNAL_ANYTHING)
+            op.left = SignalOperand(Signal.SIGNAL_EACH)
         with self.assertRaises(AssertionError):
-            op.left = SignalOperand(net, Signal.SIGNAL_EVERYTHING)
-        op.left = SignalOperand(net, Signal.SIGNAL_A)
-        op.right = SignalOperand(net, Signal.SIGNAL_A)
-        op.left = SignalOperand(net, Signal.SIGNAL_EACH)
+            op.left = SignalOperand(Signal.SIGNAL_ANYTHING)
+        with self.assertRaises(AssertionError):
+            op.left = SignalOperand(Signal.SIGNAL_EVERYTHING)
+        op.left = SignalOperand(Signal.SIGNAL_A)
+        op.right = SignalOperand(Signal.SIGNAL_A)
+        op.left = SignalOperand(Signal.SIGNAL_EACH)
         op.right = ConstantOperand(np.int32(10))
-        op.left = SignalOperand(net, Signal.SIGNAL_EACH)
-        op.result = SignalOperand(net, Signal.SIGNAL_EACH)
+        op.left = SignalOperand(Signal.SIGNAL_EACH)
+        op.result = SignalOperand(Signal.SIGNAL_EACH)
         with self.assertRaises(AssertionError):
-            op.left = SignalOperand(net, Signal.SIGNAL_A)
+            op.left = SignalOperand(Signal.SIGNAL_A)
 
     def test_right(self):
-        net = Network()
-        op = Operation(NumericOperator.ADD, SignalOperand(net, Signal.SIGNAL_A))
-        op.left = SignalOperand(net, Signal.SIGNAL_EACH)
+        op = Operation(NumericOperator.ADD, SignalOperand(Signal.SIGNAL_A))
         with self.assertRaises(AssertionError):
-            op.right = SignalOperand(net, Signal.SIGNAL_EACH)
+            op.right = SignalOperand(Signal.SIGNAL_A)
+        i_net = get_nets()
+        op.input_network = i_net
+        op.left = SignalOperand(Signal.SIGNAL_EACH)
         with self.assertRaises(AssertionError):
-            op.right = SignalOperand(net, Signal.SIGNAL_ANYTHING)
+            op.right = SignalOperand(Signal.SIGNAL_EACH)
         with self.assertRaises(AssertionError):
-            op.right = SignalOperand(net, Signal.SIGNAL_EVERYTHING)
-        op.right = SignalOperand(net, Signal.SIGNAL_A)
-        op.left = SignalOperand(net, Signal.SIGNAL_A)
-        op.right = SignalOperand(net, Signal.SIGNAL_EACH)
+            op.right = SignalOperand(Signal.SIGNAL_ANYTHING)
+        with self.assertRaises(AssertionError):
+            op.right = SignalOperand(Signal.SIGNAL_EVERYTHING)
+        op.right = SignalOperand(Signal.SIGNAL_A)
+        op.left = SignalOperand(Signal.SIGNAL_A)
+        op.right = SignalOperand(Signal.SIGNAL_EACH)
         op.left = ConstantOperand(np.int32(10))
-        op.right = SignalOperand(net, Signal.SIGNAL_EACH)
-        op.result = SignalOperand(net, Signal.SIGNAL_EACH)
+        op.right = SignalOperand(Signal.SIGNAL_EACH)
+        op.result = SignalOperand(Signal.SIGNAL_EACH)
         with self.assertRaises(AssertionError):
-            op.right = SignalOperand(net, Signal.SIGNAL_A)
+            op.right = SignalOperand(Signal.SIGNAL_A)
 
     def test_set_result(self):
-        net = Network()
-        op = Operation(NumericOperator.ADD, SignalOperand(net, Signal.SIGNAL_A))
+        i_net = get_nets()
+        op = Operation(
+            NumericOperator.ADD, SignalOperand(Signal.SIGNAL_A), input_network=i_net
+        )
         with self.assertRaises(AssertionError):
-            op.result = SignalOperand(net, Signal.SIGNAL_EACH)
-        op.right = SignalOperand(net, Signal.SIGNAL_EACH)
-        op.result = SignalOperand(net, Signal.SIGNAL_EACH)
-        op.result = SignalOperand(net, Signal.SIGNAL_A)
-        op.right = SignalOperand(net, Signal.SIGNAL_A)
-        op.left = SignalOperand(net, Signal.SIGNAL_EACH)
-        op.result = SignalOperand(net, Signal.SIGNAL_EACH)
-        op.result = SignalOperand(net, Signal.SIGNAL_A)
-        op.left = SignalOperand(net, Signal.SIGNAL_A)
+            op.result = SignalOperand(Signal.SIGNAL_EACH)
+        op.right = SignalOperand(Signal.SIGNAL_EACH)
+        op.result = SignalOperand(Signal.SIGNAL_EACH)
+        op.result = SignalOperand(Signal.SIGNAL_A)
+        op.right = SignalOperand(Signal.SIGNAL_A)
+        op.left = SignalOperand(Signal.SIGNAL_EACH)
+        op.result = SignalOperand(Signal.SIGNAL_EACH)
+        op.result = SignalOperand(Signal.SIGNAL_A)
+        op.left = SignalOperand(Signal.SIGNAL_A)
         with self.assertRaises(AssertionError):
-            op.result = SignalOperand(net, Signal.SIGNAL_EVERYTHING)
+            op.result = SignalOperand(Signal.SIGNAL_EVERYTHING)
         with self.assertRaises(AssertionError):
-            op.result = SignalOperand(net, Signal.SIGNAL_ANYTHING)
+            op.result = SignalOperand(Signal.SIGNAL_ANYTHING)
 
     def test_tick_constant(self):
-        net = Network()
+        o_net = get_nets()
         op = Operation(
             NumericOperator.ADD,
-            SignalOperand(net, Signal.SIGNAL_A),
-            ConstantOperand(np.int32(10)),
-            ConstantOperand(np.int32(10)),
+            SignalOperand(Signal.SIGNAL_A),
+            o_net,
+            left=ConstantOperand(np.int32(10)),
+            right=ConstantOperand(np.int32(10)),
         )
         op.tick()
-        net.tick()
-        self.assertEqual(net.get_signal(Signal.SIGNAL_A), 20)
+        o_net.red.tick()
+        self.assertEqual(o_net.get_signal(Signal.SIGNAL_A), 20)
         self.assertEqual(op.previous_result, {Signal.SIGNAL_A: 20})
 
     def test_tick_left_each_and_output_each(self):
-        out_net = Network()
-        left_net = Network()
+        o_net = get_nets()
+        i_net = get_nets()
         op = Operation(
             NumericOperator.ADD,
-            SignalOperand(out_net, Signal.SIGNAL_EACH),
-            SignalOperand(left_net, Signal.SIGNAL_EACH),
+            SignalOperand(Signal.SIGNAL_EACH),
+            o_net,
+            i_net,
+            SignalOperand(Signal.SIGNAL_EACH),
             ConstantOperand(np.int32(10)),
         )
-        left_net.update_signal(Signal.WATER, np.int32(10))
-        left_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
-        left_net.tick()
+        i_net.update_signal(Signal.WATER, np.int32(10))
+        i_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
+        i_net.red.tick()
         op.tick()
-        out_net.tick()
-        self.assertEqual(
-            out_net.get_signals(), {Signal.WATER: 20, Signal.SIGNAL_RED: 30}
-        )
+        o_net.red.tick()
+        self.assertEqual(o_net.get_signals(), {Signal.WATER: 20, Signal.SIGNAL_RED: 30})
 
     def test_tick_right_each_and_output_each(self):
-        out_net = Network()
-        right_net = Network()
+        o_net = get_nets()
+        i_net = get_nets()
         op = Operation(
             NumericOperator.ADD,
-            SignalOperand(out_net, Signal.SIGNAL_EACH),
+            SignalOperand(Signal.SIGNAL_EACH),
+            o_net,
+            i_net,
             ConstantOperand(np.int32(10)),
-            SignalOperand(right_net, Signal.SIGNAL_EACH),
+            SignalOperand(Signal.SIGNAL_EACH),
         )
-        right_net.update_signal(Signal.WATER, np.int32(10))
-        right_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
-        right_net.tick()
+        i_net.update_signal(Signal.WATER, np.int32(10))
+        i_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
+        i_net.red.tick()
         op.tick()
-        out_net.tick()
-        self.assertEqual(
-            out_net.get_signals(), {Signal.WATER: 20, Signal.SIGNAL_RED: 30}
-        )
+        o_net.red.tick()
+        self.assertEqual(o_net.get_signals(), {Signal.WATER: 20, Signal.SIGNAL_RED: 30})
 
     def test_tick_no_each_and_output_each(self):
-        net = Network()
         op = Operation(
             NumericOperator.ADD,
-            SignalOperand(net, Signal.SIGNAL_CYAN),
-            ConstantOperand(np.int32(10)),
-            ConstantOperand(np.int32(10)),
+            SignalOperand(Signal.SIGNAL_CYAN),
+            left=ConstantOperand(np.int32(10)),
+            right=ConstantOperand(np.int32(10)),
         )
         op.result.signal = Signal.SIGNAL_EACH
         with self.assertRaises(AssertionError):
             op.tick()
 
     def test_tick_left_each_and_output_no_each(self):
-        out_net = Network()
-        left_net = Network()
+        o_net = get_nets()
+        i_net = get_nets()
         op = Operation(
             NumericOperator.ADD,
-            SignalOperand(out_net, Signal.SIGNAL_PINK),
-            SignalOperand(left_net, Signal.SIGNAL_EACH),
+            SignalOperand(Signal.SIGNAL_PINK),
+            o_net,
+            i_net,
+            SignalOperand(Signal.SIGNAL_EACH),
             ConstantOperand(np.int32(10)),
         )
-        left_net.update_signal(Signal.WATER, np.int32(10))
-        left_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
-        left_net.tick()
+        i_net.update_signal(Signal.WATER, np.int32(10))
+        i_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
+        i_net.red.tick()
         op.tick()
-        out_net.tick()
-        self.assertEqual(out_net.get_signal(Signal.SIGNAL_PINK), 50)
+        o_net.red.tick()
+        self.assertEqual(o_net.get_signal(Signal.SIGNAL_PINK), 50)
 
     def test_tick_right_each_and_output_no_each(self):
-        out_net = Network()
-        right_net = Network()
+        o_net = get_nets()
+        i_net = get_nets()
         op = Operation(
             NumericOperator.ADD,
-            SignalOperand(out_net, Signal.SIGNAL_WHITE),
+            SignalOperand(Signal.SIGNAL_WHITE),
+            o_net,
+            i_net,
             ConstantOperand(np.int32(10)),
-            SignalOperand(right_net, Signal.SIGNAL_EACH),
+            SignalOperand(Signal.SIGNAL_EACH),
         )
-        right_net.update_signal(Signal.WATER, np.int32(10))
-        right_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
-        right_net.tick()
+        i_net.update_signal(Signal.WATER, np.int32(10))
+        i_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
+        i_net.red.tick()
         op.tick()
-        out_net.tick()
-        self.assertEqual(out_net.get_signal(Signal.SIGNAL_WHITE), 50)
+        o_net.red.tick()
+        self.assertEqual(o_net.get_signal(Signal.SIGNAL_WHITE), 50)

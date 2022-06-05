@@ -3,9 +3,10 @@ from typing import Optional, Any
 
 import numpy as np
 
-from .ASTNode import ASTNode
+from .DoubleNetwork import DoubleNetwork
 from .Operand import Operand, ConstantOperand, SignalOperand
 from .Signal import Signal, Signals
+from .TwoSidedASTNode import TwoSidedASTNode
 
 
 class NumericOperator(Enum):
@@ -47,15 +48,17 @@ class NumericOperator(Enum):
         raise NotImplementedError(f"Unknown operator {self}")
 
 
-class Operation(ASTNode):
+class Operation(TwoSidedASTNode):
     def __init__(
         self,
         operation: NumericOperator,
         result: SignalOperand,
+        output_network: Optional[DoubleNetwork] = None,
+        input_network: Optional[DoubleNetwork] = None,
         left: Optional[Operand] = None,
         right: Optional[Operand] = None,
     ):
-        super().__init__("Operation")
+        super().__init__("Operation", output_network, input_network)
         self.operation: NumericOperator = operation
         # set these for comparison
         self._left: Operand = left if left else ConstantOperand(np.int32(0))
@@ -66,58 +69,14 @@ class Operation(ASTNode):
         self.left = self._left
         self.right = self._right
 
-    def tick(self) -> None:
-        results: Signals = {}
-        if not (self.left.is_each() or self.right.is_each()):
-            results[self.result.signal] = self.operation.calculate(
-                self.left.value(), self.right.value()
-            )
-        else:
-            if self.left.is_each():
-                assert isinstance(self.left, SignalOperand) and (
-                    left_net := self.left.network
-                )
-                for signal, value in left_net.get_signals().items():
-                    results[signal] = self.operation.calculate(
-                        value, self.right.value()
-                    )
-            elif self.right.is_each():
-                assert isinstance(self.right, SignalOperand) and (
-                    right_net := self.right.network
-                )
-                for signal, value in right_net.get_signals().items():
-                    results[signal] = self.operation.calculate(self.left.value(), value)
-            else:
-                raise AssertionError(
-                    "result is each, but neither left nor right are each"
-                )
-        assert (result_net := self.result.network)
-        if self.result.is_each():
-            for signal, value in results.items():
-                result_net.update_signal(signal, value)
-        else:
-            self.result.update_self(np.sum([*results.values()], dtype=np.int32))
-        self.previous_result = results
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Operation):
-            return (
-                self.operation == other.operation
-                and self.right == other.right
-                and self.left == other.left
-                and self.result == other.result
-            )
-        return False
-
-    def __repr__(self) -> str:
-        return f"Operation(operation={self.operation}, left={self.left}, right={self.right})"
-
     @property
     def left(self) -> Operand:
         return self._left
 
     @left.setter
     def left(self, left: Operand) -> None:
+        if left and isinstance(left, SignalOperand):
+            assert self.input_network, "can not set signal without network"
         if left.is_each():
             assert (
                 not self.right.is_each()
@@ -138,6 +97,8 @@ class Operation(ASTNode):
 
     @right.setter
     def right(self, right: Operand) -> None:
+        if right and isinstance(right, SignalOperand):
+            assert self.input_network, "can not set signal without network"
         if right.is_each():
             assert not self.left.is_each(), "Only one operand for Operation may be Each"
         elif right.abstract():
@@ -165,3 +126,60 @@ class Operation(ASTNode):
                 self.left.is_each() or self.right.is_each()
             ), "Need to have one Operand as Each in order to set result to each"
         self._result = op
+
+    def _get_input_value(self, op: Operand) -> np.int32:
+        if isinstance(op, SignalOperand):
+            assert self.input_network
+            self.input_network.get_signal(op.signal)
+        elif isinstance(op, ConstantOperand):
+            return op.constant
+        raise NotImplementedError(f"Invalid operand {op}")
+
+    def tick(self) -> None:
+        results: Signals = {}
+        if not (self.left.is_each() or self.right.is_each()):
+            assert (
+                not self.result.is_each()
+            ), "result is each, but neither left nor right are each"
+            results[self.result.signal] = self.operation.calculate(
+                self._get_input_value(self.left),
+                self._get_input_value(self.right),
+            )
+        else:
+            assert self.input_network
+            if self.left.is_each():
+                assert self.input_network
+                for signal, value in self.input_network.get_signals().items():
+                    results[signal] = self.operation.calculate(
+                        value, self._get_input_value(self.right)
+                    )
+            elif self.right.is_each():
+                for signal, value in self.input_network.get_signals().items():
+                    results[signal] = self.operation.calculate(
+                        self._get_input_value(self.left), value
+                    )
+            else:
+                raise NotImplementedError("unreachable")
+        if self.output_network:
+            if self.result.is_each():
+                for signal, value in results.items():
+                    self.output_network.update_signal(signal, value)
+            else:
+                self.output_network.update_signal(
+                    self.result.signal, np.sum([*results.values()], dtype=np.int32)
+                )
+        self.previous_result = results
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Operation):
+            return (
+                super().__eq__(other)
+                and self.operation == other.operation
+                and self.right == other.right
+                and self.left == other.left
+                and self.result == other.result
+            )
+        return False
+
+    def __repr__(self) -> str:
+        return f"Operation(operation={self.operation}, left={self.left}, right={self.right})"
