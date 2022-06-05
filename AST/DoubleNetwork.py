@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 
 import numpy as np
 
@@ -63,3 +63,8 @@ class DoubleNetwork:
         if net and net.type != NetworkType.GREEN:
             raise TypeError("Can not assign green network to red DoubleNetwork part")
         self._green = net
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, DoubleNetwork):
+            return self.red == other.red and self.green == other.green
+        return False

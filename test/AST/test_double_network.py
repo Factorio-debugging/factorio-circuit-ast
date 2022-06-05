@@ -124,3 +124,19 @@ class TestDoubleNetwork(unittest.TestCase):
         d_net.update_signals(signals)
         r_net.tick()
         self.assertEqual(r_net.get_signals(), signals)
+
+    def test_eq(self):
+        r_net = Network(network=NetworkType.RED)
+        g_net = Network(network=NetworkType.GREEN)
+        net1 = DoubleNetwork()
+        net2 = DoubleNetwork()
+        self.assertNotEqual(net1, r_net)
+        self.assertEqual(net1, net2)
+        net1.red = r_net
+        self.assertNotEqual(net1, net2)
+        net2.red = r_net
+        self.assertEqual(net1, net2)
+        net2.green = g_net
+        self.assertNotEqual(net1, net2)
+        net1.green = g_net
+        self.assertEqual(net1, net2)
