@@ -130,7 +130,7 @@ class Operation(TwoSidedASTNode):
     def _get_input_value(self, op: Operand) -> np.int32:
         if isinstance(op, SignalOperand):
             assert self.input_network
-            self.input_network.get_signal(op.signal)
+            return self.input_network.get_signal(op.signal)
         elif isinstance(op, ConstantOperand):
             return op.constant
         raise NotImplementedError(f"Invalid operand {op}")

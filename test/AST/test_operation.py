@@ -287,3 +287,21 @@ class TestOperation(unittest.TestCase):
         op.tick()
         o_net.red.tick()
         self.assertEqual(o_net.get_signal(Signal.SIGNAL_WHITE), 50)
+
+    def test_calculate_signals(self):
+        o_net = get_nets()
+        i_net = get_nets()
+        op = Operation(
+            NumericOperator.ADD,
+            SignalOperand(Signal.SIGNAL_WHITE),
+            o_net,
+            i_net,
+            ConstantOperand(np.int32(10)),
+            SignalOperand(Signal.WATER),
+        )
+        i_net.update_signal(Signal.WATER, np.int32(10))
+        i_net.update_signal(Signal.SIGNAL_RED, np.int32(20))
+        i_net.red.tick()
+        op.tick()
+        o_net.red.tick()
+        self.assertEqual(o_net.get_signal(Signal.SIGNAL_WHITE), 20)
