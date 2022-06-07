@@ -5,6 +5,7 @@ import numpy as np
 
 from .DoubleNetwork import DoubleNetwork
 from .Operand import Operand, SignalOperand, ConstantOperand
+from .Signal import Signal
 from .TwoSidedASTNode import TwoSidedASTNode
 
 
@@ -105,6 +106,9 @@ class Comparison(TwoSidedASTNode):
     @result.setter
     def result(self, op: SignalOperand) -> None:
         if op.abstract():
+            assert (
+                self.input_network
+            ), "can not use result wildcards without input network"
             if op.is_everything():
                 assert (
                     not self.left.is_each()
@@ -124,13 +128,59 @@ class Comparison(TwoSidedASTNode):
     def _get_input_value(self, op: Operand) -> np.int32:
         if isinstance(op, SignalOperand):
             assert self.input_network
-            self.input_network.get_signal(op.signal)
+            return self.input_network.get_signal(op.signal)
         elif isinstance(op, ConstantOperand):
             return op.constant
         raise NotImplementedError(f"Invalid operand {op}")
 
     def tick(self) -> None:
-        ...
+        self.previous_result = {}
+        if self.left.is_each():
+            raise NotImplementedError
+        else:
+            passed: bool = False
+            if self.left.is_anything():
+                raise NotImplementedError
+            elif self.left.is_everything():
+                assert self.input_network
+                other_signal: Optional[Signal] = (
+                    right.signal
+                    if isinstance(right := self.right, SignalOperand)
+                    else None
+                )
+                other_value: np.int32 = self._get_input_value(self.right)
+                passed = True
+                for key, value in self.input_network.get_signals().items():
+                    if other_signal and key == other_signal:
+                        continue
+                    if not self.operation.calculate(value, other_value):
+                        passed = False
+                        break
+            else:
+                passed = bool(
+                    self.operation.calculate(
+                        self._get_input_value(self.left),
+                        self._get_input_value(self.right),
+                    )
+                )
+            if passed and self.input_network:
+                if self.result.is_everything():
+                    self.previous_result = {
+                        key: value if self.copy_count_from_input else np.int32(1)
+                        for key, value in self.input_network.get_signals().items()
+                        if value != 0
+                    }
+                else:
+                    self.previous_result = {
+                        self.result.signal: self._get_input_value(self.result)
+                        if self.copy_count_from_input
+                        else np.int32(1)
+                    }
+            elif passed:
+                if not self.result.is_everything() and not self.copy_count_from_input:
+                    self.previous_result = {self.result.signal: np.int32(1)}
+        if self.output_network:
+            self.output_network.update_signals(self.previous_result)
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Comparison):

@@ -2,7 +2,7 @@ import unittest
 
 from AST.Comparison import *
 from AST.Network import Network, NetworkType
-from AST.Signal import Signal
+from AST.Signal import Signal, Signals
 
 
 class TestDeciderOperator(unittest.TestCase):
@@ -211,6 +211,10 @@ class TestComparison(unittest.TestCase):
                 right=SignalOperand(Signal.SIGNAL_A),
             )
 
+    def test_result_setter_no_network(self):
+        with self.assertRaises(AssertionError):
+            Comparison(DeciderOperator.EQUAL, SignalOperand(Signal.SIGNAL_EVERYTHING))
+
     def test_eq(self):
         i_net = get_nets()
         o_net = get_nets()
@@ -238,3 +242,115 @@ class TestComparison(unittest.TestCase):
         self.assertNotEqual(op1, op2)
         op1.copy_count_from_input = False
         self.assertEqual(op1, op2)
+
+    def test_previous_result_after_tick(self):
+        o_net = get_nets()
+        cmp = Comparison(DeciderOperator.EQUAL, SignalOperand(Signal.SIGNAL_A), o_net)
+        cmp.tick()
+        o_net.red.tick()
+        self.assertEqual(cmp.previous_result, o_net.get_signals())
+
+    def test_compare_constant(self):
+        cmp = Comparison(
+            DeciderOperator.EQUAL,
+            SignalOperand(Signal.SIGNAL_A),
+            left=ConstantOperand(np.int32(10)),
+            right=ConstantOperand(np.int32(20)),
+            copy_count_from_input=False,
+        )
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {})
+        cmp.right = ConstantOperand(np.int32(10))
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {Signal.SIGNAL_A: 1})
+        cmp.copy_count_from_input = True
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {})
+
+    def test_compare_constant_result_everything(self):
+        o_net = get_nets()
+        i_net = get_nets()
+        cmp = Comparison(
+            DeciderOperator.EQUAL,
+            SignalOperand(Signal.SIGNAL_EVERYTHING),
+            o_net,
+            i_net,
+            left=ConstantOperand(np.int32(10)),
+            right=ConstantOperand(np.int32(10)),
+            copy_count_from_input=False,
+        )
+        sig: Signals = {
+            Signal.SIGNAL_A: 20,
+            Signal.SIGNAL_E: 30,
+        }
+        i_net.update_signals(sig)
+        i_net.red.tick()
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {s: 1 for s in sig.keys()})
+        cmp.copy_count_from_input = True
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, sig)
+
+    def test_compare_everything(self):
+        o_net = get_nets()
+        i_net = get_nets()
+        cmp = Comparison(
+            DeciderOperator.GREATER_THAN,
+            SignalOperand(Signal.SIGNAL_A),
+            o_net,
+            i_net,
+            left=SignalOperand(Signal.SIGNAL_EVERYTHING),
+            right=ConstantOperand(np.int32(5)),
+            copy_count_from_input=False,
+        )
+        sig: Signals = {
+            Signal.SIGNAL_A: 10,
+            Signal.SIGNAL_R: 20,
+        }
+        i_net.update_signals(sig)
+        i_net.red.tick()
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {Signal.SIGNAL_A: 1})
+        cmp.result.signal = Signal.SIGNAL_R
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {Signal.SIGNAL_R: 1})
+        cmp.copy_count_from_input = True
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {Signal.SIGNAL_R: 20})
+        cmp.result.signal = Signal.SIGNAL_A
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {Signal.SIGNAL_A: 10})
+        cmp.operation = DeciderOperator.EQUAL
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {})
+
+    def test_compare_everything_result_everything(self):
+        o_net = get_nets()
+        i_net = get_nets()
+        cmp = Comparison(
+            DeciderOperator.GREATER_THAN,
+            SignalOperand(Signal.SIGNAL_EVERYTHING),
+            o_net,
+            i_net,
+            left=SignalOperand(Signal.SIGNAL_EVERYTHING),
+            right=ConstantOperand(np.int32(5)),
+            copy_count_from_input=False,
+        )
+        sig: Signals = {
+            Signal.SIGNAL_A: 10,
+            Signal.SIGNAL_R: 20,
+        }
+        i_net.update_signals(sig)
+        i_net.red.tick()
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {s: 1 for s in sig.keys()})
+        cmp.copy_count_from_input = True
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, sig)
+        cmp.operation = DeciderOperator.EQUAL
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {})
+        cmp.operation = DeciderOperator.GREATER_THAN
+        cmp.right = SignalOperand(Signal.SIGNAL_A)
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, sig)
