@@ -182,4 +182,12 @@ class Operation(TwoSidedASTNode):
         return False
 
     def __repr__(self) -> str:
-        return f"Operation(operation={self.operation}, left={self.left}, right={self.right})"
+        return (
+            f"Operation("
+            f"operation={self.operation}, "
+            f"result={self.result}, "
+            f"output_network={self.output_network}, "
+            f"input_network={self.input_network}, "
+            f"left={self.left}, "
+            f"right={self.right})"
+        )
