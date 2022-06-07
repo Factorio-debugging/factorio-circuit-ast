@@ -18,4 +18,4 @@ class TwoSidedASTNode(ASTNode, ABC):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, TwoSidedASTNode):
             return super().__eq__(other) and self.input_network == other.input_network
-        return False
+        return False  # pragma: no cover
