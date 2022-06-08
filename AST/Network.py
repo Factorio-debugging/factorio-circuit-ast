@@ -9,7 +9,7 @@ import numpy as np
 from .ASTNode import ASTNode
 from .Signal import Signal, WildcardSignal, Signals
 
-networks: Dict[int, ReferenceType[Network]] = {}
+networks: Dict[int, Network] = {}
 
 
 class NetworkType(Enum):
@@ -27,7 +27,7 @@ class Network:
         self._previous_state: Signals = {}
         self._current_state: Signals = {}
         self.id = nid if nid is not None else max([*networks.keys(), 0]) + 1
-        networks[self.id] = ref(self)
+        networks[self.id] = self
 
     def depends_on(self, node: ASTNode) -> None:
         self._depends.append(ref(node))

@@ -12,11 +12,11 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(net._previous_state, {})
         self.assertEqual(net._current_state, {})
         self.assertIsInstance(net.id, int)
-        self.assertIs(networks[net.id](), net)
+        self.assertIs(networks[net.id], net)
         self.assertEqual(net.type, NetworkType.RED)
         net = Network(nid=1024, network=NetworkType.GREEN)
         self.assertEqual(net.id, 1024)
-        self.assertIs(networks[1024](), net)
+        self.assertIs(networks[1024], net)
         self.assertEqual(net.type, NetworkType.GREEN)
 
     def test_get_signal(self):
