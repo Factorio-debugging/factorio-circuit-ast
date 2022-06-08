@@ -135,32 +135,47 @@ class Comparison(TwoSidedASTNode):
 
     def tick(self) -> None:
         self.previous_result = {}
+        right_value: np.int32 = self._get_input_value(self.right)
         if self.left.is_each():
-            raise NotImplementedError
+            assert self.input_network
+            for key, value in self.input_network.get_signals().items():
+                if self.operation.calculate(value, right_value):
+                    self.previous_result[key] = value if self.copy_count_from_input else np.int32(1)
+            if not self.result.is_each() and self.previous_result:
+                self.previous_result = {
+                    self.result.signal:
+                    np.sum([*self.previous_result.values()], dtype=np.int32)
+                }
         else:
             passed: bool = False
+            right_signal: Optional[Signal] = (
+                right.signal
+                if isinstance(right := self.right, SignalOperand)
+                else None
+            )
             if self.left.is_anything():
-                raise NotImplementedError
+                assert self.input_network
+                for key, value in self.input_network.get_signals().items():
+                    if right_signal and key == right_signal:
+                        continue
+                    if self.operation.calculate(value, right_value):
+                        self.previous_result = {key: value if self.copy_count_from_input else np.int32(1)}
+                        passed = True
+                        break
             elif self.left.is_everything():
                 assert self.input_network
-                other_signal: Optional[Signal] = (
-                    right.signal
-                    if isinstance(right := self.right, SignalOperand)
-                    else None
-                )
-                other_value: np.int32 = self._get_input_value(self.right)
                 passed = True
                 for key, value in self.input_network.get_signals().items():
-                    if other_signal and key == other_signal:
+                    if right_signal and key == right_signal:
                         continue
-                    if not self.operation.calculate(value, other_value):
+                    if not self.operation.calculate(value, right_value):
                         passed = False
                         break
             else:
                 passed = bool(
                     self.operation.calculate(
                         self._get_input_value(self.left),
-                        self._get_input_value(self.right),
+                        right_value,
                     )
                 )
             if passed and self.input_network:
@@ -170,7 +185,7 @@ class Comparison(TwoSidedASTNode):
                         for key, value in self.input_network.get_signals().items()
                         if value != 0
                     }
-                else:
+                elif not self.result.is_anything():
                     self.previous_result = {
                         self.result.signal: self._get_input_value(self.result)
                         if self.copy_count_from_input
