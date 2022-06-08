@@ -271,14 +271,14 @@ class Signal(Enum):
     SIGNAL_EACH: str = "signal-each"
 
 
-AbstractSignal: List[Signal] = [
+WildcardSignal: List[Signal] = [
     Signal.SIGNAL_EVERYTHING,
     Signal.SIGNAL_ANYTHING,
     Signal.SIGNAL_EACH,
 ]
 
 ConcreteSignal: List[Signal] = [
-    signal for signal in Signal.__members__.values() if signal not in AbstractSignal
+    signal for signal in Signal.__members__.values() if signal not in WildcardSignal
 ]
 
 Signals = Dict[Signal, np.int32]

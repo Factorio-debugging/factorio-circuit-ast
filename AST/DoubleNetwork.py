@@ -3,7 +3,7 @@ from typing import Optional, Any
 import numpy as np
 
 from .Network import Network, NetworkType
-from .Signal import Signal, AbstractSignal, Signals
+from .Signal import Signal, WildcardSignal, Signals
 
 
 class DoubleNetwork:
@@ -14,7 +14,7 @@ class DoubleNetwork:
         self.green = green
 
     def get_signal(self, signal: Signal) -> np.int32:
-        assert signal not in AbstractSignal
+        assert signal not in WildcardSignal
         return (self.red.get_signal(signal) if self.red else np.int32(0)) + (
             self.green.get_signal(signal) if self.green else np.int32(0)
         )
@@ -27,7 +27,7 @@ class DoubleNetwork:
         return result
 
     def update_signal(self, signal: Signal, value: np.int32) -> None:
-        assert signal not in AbstractSignal
+        assert signal not in WildcardSignal
         if self.red:
             self.red.update_signal(signal, value)
         if self.green:

@@ -81,7 +81,7 @@ class Operation(TwoSidedASTNode):
             assert (
                 not self.right.is_each()
             ), "Only one operand for Operation may be Each"
-        elif left.abstract():
+        elif left.wildcard():
             raise AssertionError(
                 "Only concrete signals or Each are allowed in Operation"
             )
@@ -101,7 +101,7 @@ class Operation(TwoSidedASTNode):
             assert self.input_network, "can not set signal without network"
         if right.is_each():
             assert not self.left.is_each(), "Only one operand for Operation may be Each"
-        elif right.abstract():
+        elif right.wildcard():
             raise AssertionError(
                 "Only concrete signals or Each are allowed in Operation"
             )

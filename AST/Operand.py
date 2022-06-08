@@ -3,12 +3,12 @@ from typing import Any
 
 import numpy as np
 
-from .Signal import Signal, AbstractSignal
+from .Signal import Signal, WildcardSignal
 
 
 class Operand(ABC):
     @abstractmethod
-    def abstract(self) -> bool:
+    def wildcard(self) -> bool:
         raise NotImplementedError
 
     @abstractmethod
@@ -28,8 +28,8 @@ class SignalOperand(Operand):
     def __init__(self, signal: Signal):
         self.signal: Signal = signal
 
-    def abstract(self) -> bool:
-        return self.signal in AbstractSignal
+    def wildcard(self) -> bool:
+        return self.signal in WildcardSignal
 
     def is_each(self) -> bool:
         return self.signal == Signal.SIGNAL_EACH
@@ -53,7 +53,7 @@ class ConstantOperand(Operand):
     def __init__(self, constant: np.int32):
         self.constant: np.int32 = constant
 
-    def abstract(self) -> bool:
+    def wildcard(self) -> bool:
         return False
 
     def is_each(self) -> bool:

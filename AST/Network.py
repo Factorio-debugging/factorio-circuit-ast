@@ -7,7 +7,7 @@ from weakref import ref, ReferenceType
 import numpy as np
 
 from .ASTNode import ASTNode
-from .Signal import Signal, AbstractSignal, Signals
+from .Signal import Signal, WildcardSignal, Signals
 
 networks: Dict[int, ReferenceType[Network]] = {}
 
@@ -37,7 +37,7 @@ class Network:
 
     def get_signal(self, signal: Signal) -> np.int32:
         assert (
-            signal not in AbstractSignal
+            signal not in WildcardSignal
         ), f"only concrete signals are allowed in get_signal, got {signal}"
         return self._previous_state.setdefault(signal, np.int32(0))
 
@@ -50,7 +50,7 @@ class Network:
 
     def update_signal(self, signal: Signal, value: np.int32) -> None:
         assert (
-            signal not in AbstractSignal
+            signal not in WildcardSignal
         ), f"only concrete signals are allowed in update_signal, got {signal}"
         self._current_state[signal] = (
             self._current_state.setdefault(signal, np.int32(0)) + value

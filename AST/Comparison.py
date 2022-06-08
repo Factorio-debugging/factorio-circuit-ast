@@ -65,7 +65,7 @@ class Comparison(TwoSidedASTNode):
     def left(self, left: Operand) -> None:
         if left and isinstance(left, SignalOperand):
             assert self.input_network, "can not set signal without network"
-        if left.abstract():
+        if left.wildcard():
             if left.is_everything():
                 assert not (
                     self.result.is_each() or self.result.is_anything()
@@ -79,7 +79,7 @@ class Comparison(TwoSidedASTNode):
                     self.result.is_anything() or self.result.is_everything()
                 ), "each wildcard needs each or concrete signal as result"
             else:
-                raise NotImplementedError(f"Unknown abstract signal {left}")
+                raise NotImplementedError(f"Unknown wildcard signal {left}")
         else:
             assert not (
                 self.result.is_each() or self.result.is_anything()
@@ -93,8 +93,8 @@ class Comparison(TwoSidedASTNode):
     @right.setter
     def right(self, right: Operand) -> None:
         assert (
-            not right.abstract()
-        ), "right side of comparison is not allowed to be abstract"
+            not right.wildcard()
+        ), "right side of comparison is not allowed to be a wildcard"
         if right and isinstance(right, SignalOperand):
             assert self.input_network, "can not set signal without network"
         self._right = right
@@ -105,7 +105,7 @@ class Comparison(TwoSidedASTNode):
 
     @result.setter
     def result(self, op: SignalOperand) -> None:
-        if op.abstract():
+        if op.wildcard():
             assert (
                 self.input_network
             ), "can not use result wildcards without input network"
@@ -122,7 +122,7 @@ class Comparison(TwoSidedASTNode):
                     self.left.is_each()
                 ), "each wildcard needs each signal on the left side"
             else:
-                raise NotImplementedError(f"Unknown abstract signal {op}")
+                raise NotImplementedError(f"Unknown wildcard signal {op}")
         self._result = op
 
     def _get_input_value(self, op: Operand) -> np.int32:

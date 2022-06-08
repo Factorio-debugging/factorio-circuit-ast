@@ -19,15 +19,15 @@ class TestSignalOperand(unittest.TestCase):
 
     def test_abstract(self):
         op = SignalOperand(Signal.SIGNAL_A)
-        self.assertEqual(op.abstract(), False)
+        self.assertEqual(op.wildcard(), False)
         op.signal = Signal.SIGNAL_EACH
-        self.assertEqual(op.abstract(), True)
+        self.assertEqual(op.wildcard(), True)
         op.signal = Signal.SIGNAL_EVERYTHING
-        self.assertEqual(op.abstract(), True)
+        self.assertEqual(op.wildcard(), True)
         op.signal = Signal.SIGNAL_ANYTHING
-        self.assertEqual(op.abstract(), True)
+        self.assertEqual(op.wildcard(), True)
         op.signal = Signal.WATER
-        self.assertEqual(op.abstract(), False)
+        self.assertEqual(op.wildcard(), False)
 
     def test_each(self):
         op = SignalOperand(Signal.SIGNAL_A)
@@ -82,7 +82,7 @@ class TestConstantOperand(unittest.TestCase):
 
     def test_abstract(self):
         op = ConstantOperand(np.int32(12))
-        self.assertEqual(op.abstract(), False)
+        self.assertEqual(op.wildcard(), False)
 
     def test_each(self):
         op = ConstantOperand(np.int32(12))

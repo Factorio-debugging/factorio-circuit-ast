@@ -136,7 +136,7 @@ class TestComparison(unittest.TestCase):
                 self.setter_result_auto(input_o, output_o)
         else:
             self.setter_left_auto(input_o, output_o)
-            if input_o.abstract():
+            if input_o.wildcard():
                 with self.assertRaises(AssertionError):
                     self.setter_right_auto(input_o, output_o)
             else:
