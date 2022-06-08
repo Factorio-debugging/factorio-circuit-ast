@@ -14,8 +14,9 @@ class TwoSidedASTNode(ASTNode, ABC):
         name: str,
         output_network: Optional[DoubleNetwork] = None,
         input_network: Optional[DoubleNetwork] = None,
+        nid: Optional[int] = None,
     ):
-        super().__init__(name, output_network)
+        super().__init__(name, output_network, nid)
         self.input_network: Optional[DoubleNetwork] = input_network
 
     def __eq__(self, other: Any) -> bool:
