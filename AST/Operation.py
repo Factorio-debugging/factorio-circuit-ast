@@ -127,14 +127,6 @@ class Operation(TwoSidedASTNode):
             ), "Need to have one Operand as Each in order to set result to each"
         self._result = op
 
-    def _get_input_value(self, op: Operand) -> np.int32:
-        if isinstance(op, SignalOperand):
-            assert self.input_network
-            return self.input_network.get_signal(op.signal)
-        elif isinstance(op, ConstantOperand):
-            return op.constant
-        raise NotImplementedError(f"Invalid operand {op}")
-
     def tick(self) -> None:
         results: Signals = {}
         if not (self.left.is_each() or self.right.is_each()):

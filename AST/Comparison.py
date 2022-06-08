@@ -125,14 +125,6 @@ class Comparison(TwoSidedASTNode):
                 raise NotImplementedError(f"Unknown wildcard signal {op}")
         self._result = op
 
-    def _get_input_value(self, op: Operand) -> np.int32:
-        if isinstance(op, SignalOperand):
-            assert self.input_network
-            return self.input_network.get_signal(op.signal)
-        elif isinstance(op, ConstantOperand):
-            return op.constant
-        raise NotImplementedError(f"Invalid operand {op}")
-
     def tick(self) -> None:
         self.previous_result = {}
         right_value: np.int32 = self._get_input_value(self.right)
