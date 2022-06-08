@@ -11,8 +11,9 @@ class Constant(ASTNode):
         output_network: Optional[DoubleNetwork] = None,
         signals: Optional[Signals] = None,
         is_on: bool = True,
+        nid: Optional[int] = None,
     ):
-        super().__init__("Constant", output_network)
+        super().__init__("Constant", output_network, nid)
         self.signals = signals if signals else {}
         self.is_on: bool = is_on
 

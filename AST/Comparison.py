@@ -46,8 +46,9 @@ class Comparison(TwoSidedASTNode):
         left: Optional[Operand] = None,
         right: Optional[Operand] = None,
         copy_count_from_input: bool = True,
+        nid: Optional[int] = None,
     ):
-        super().__init__("Comparison", output_network, input_network)
+        super().__init__("Comparison", output_network, input_network, nid)
         self.operation: DeciderOperator = operation
         self._result: SignalOperand = result
         self._left: Operand = left if left else ConstantOperand(np.int32(0))

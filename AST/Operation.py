@@ -57,8 +57,9 @@ class Operation(TwoSidedASTNode):
         input_network: Optional[DoubleNetwork] = None,
         left: Optional[Operand] = None,
         right: Optional[Operand] = None,
+        nid: Optional[int] = None,
     ):
-        super().__init__("Operation", output_network, input_network)
+        super().__init__("Operation", output_network, input_network, nid)
         self.operation: NumericOperator = operation
         # set these for comparison
         self._left: Operand = left if left else ConstantOperand(np.int32(0))
