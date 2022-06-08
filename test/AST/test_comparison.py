@@ -435,7 +435,9 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(cmp.previous_result, {Signal.SIGNAL_A: 1, Signal.SIGNAL_R: 1})
         cmp.copy_count_from_input = True
         cmp.tick()
-        self.assertEqual(cmp.previous_result, {Signal.SIGNAL_A: 10, Signal.SIGNAL_R: 20})
+        self.assertEqual(
+            cmp.previous_result, {Signal.SIGNAL_A: 10, Signal.SIGNAL_R: 20}
+        )
         cmp.right = ConstantOperand(np.int32(5))
         cmp.tick()
         self.assertEqual(cmp.previous_result, {})
@@ -502,7 +504,9 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(cmp.previous_result, {Signal.SIGNAL_A: 1, Signal.SIGNAL_E: 1})
         cmp.copy_count_from_input = True
         cmp.tick()
-        self.assertEqual(cmp.previous_result, {Signal.SIGNAL_A: 10, Signal.SIGNAL_E: 10})
+        self.assertEqual(
+            cmp.previous_result, {Signal.SIGNAL_A: 10, Signal.SIGNAL_E: 10}
+        )
         cmp.right = ConstantOperand(np.int32(5))
         cmp.tick()
         self.assertEqual(cmp.previous_result, {})

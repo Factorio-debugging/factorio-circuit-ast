@@ -140,18 +140,19 @@ class Comparison(TwoSidedASTNode):
             assert self.input_network
             for key, value in self.input_network.get_signals().items():
                 if self.operation.calculate(value, right_value):
-                    self.previous_result[key] = value if self.copy_count_from_input else np.int32(1)
+                    self.previous_result[key] = (
+                        value if self.copy_count_from_input else np.int32(1)
+                    )
             if not self.result.is_each() and self.previous_result:
                 self.previous_result = {
-                    self.result.signal:
-                    np.sum([*self.previous_result.values()], dtype=np.int32)
+                    self.result.signal: np.sum(
+                        [*self.previous_result.values()], dtype=np.int32
+                    )
                 }
         else:
             passed: bool = False
             right_signal: Optional[Signal] = (
-                right.signal
-                if isinstance(right := self.right, SignalOperand)
-                else None
+                right.signal if isinstance(right := self.right, SignalOperand) else None
             )
             if self.left.is_anything():
                 assert self.input_network
@@ -159,7 +160,9 @@ class Comparison(TwoSidedASTNode):
                     if right_signal and key == right_signal:
                         continue
                     if self.operation.calculate(value, right_value):
-                        self.previous_result = {key: value if self.copy_count_from_input else np.int32(1)}
+                        self.previous_result = {
+                            key: value if self.copy_count_from_input else np.int32(1)
+                        }
                         passed = True
                         break
             elif self.left.is_everything():
