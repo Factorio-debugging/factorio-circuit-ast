@@ -384,6 +384,11 @@ class TestComparison(unittest.TestCase):
         cmp.right = ConstantOperand(np.int32(5))
         cmp.tick()
         self.assertEqual(cmp.previous_result, {})
+        i_net.update_signal(Signal.SIGNAL_A, np.int32(10))
+        i_net.red.tick()
+        cmp.right = SignalOperand(Signal.SIGNAL_A)
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {})
 
     def test_compare_anything_result_anything(self):
         o_net = get_nets()
@@ -476,6 +481,9 @@ class TestComparison(unittest.TestCase):
         cmp.right = ConstantOperand(np.int32(5))
         cmp.tick()
         self.assertEqual(cmp.previous_result, {})
+        cmp.right = SignalOperand(Signal.SIGNAL_A)
+        cmp.tick()
+        self.assertEqual(cmp.previous_result, {Signal.SIGNAL_R: 20})
 
     def test_compare_each_result_each(self):
         o_net = get_nets()
