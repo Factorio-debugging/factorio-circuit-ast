@@ -216,3 +216,13 @@ class Comparison(TwoSidedASTNode):
             f"right={self.right}, "
             f"copy_count_from_input={self.copy_count_from_input})"
         )
+
+    def cli_repr(self) -> str:
+        return (
+            f"Comparison "
+            f"input={self.input_network.cli_repr() if self.input_network else '-'} "
+            f"output={self.output_network.cli_repr() if self.output_network else '-'} "
+            f"({self.left.cli_repr()} {self.operation.value} {self.right.cli_repr()}) "
+            f"-> {self.result.cli_repr()} "
+            f"({'copy' if self.copy_count_from_input else 'no_copy'})"
+        )

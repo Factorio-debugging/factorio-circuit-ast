@@ -71,3 +71,6 @@ class DoubleNetwork:
 
     def __repr__(self) -> str:
         return f"DoubleNetwork(red={self.red!r}, green={self.green!r})"
+
+    def cli_repr(self) -> str:
+        return f"[r={self.red.cli_repr() if self.red else '-'},g={self.green.cli_repr() if self.green else '-'}]"

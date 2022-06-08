@@ -87,3 +87,7 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(net.get_signals(), {})
         net.tick()
         self.assertEqual(net.get_signals(), values)
+
+    def test_cli_repr(self):
+        net = Network()
+        self.assertEqual(net.cli_repr(), f"n{net.id}")

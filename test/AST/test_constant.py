@@ -59,3 +59,17 @@ class TestConstant(unittest.TestCase):
         self.assertEqual(const.previous_result, {})
         net.red.tick()
         self.assertEqual(net.get_signals(), {})
+
+    def test_cli_repr(self):
+        net = get_nets()
+        sig: Signals = {
+            Signal.SIGNAL_A: np.int32(10),
+            Signal.RAIL_SIGNAL: np.int32(20),
+        }
+        const = Constant(net, sig, False)
+        self.assertEqual(
+            const.cli_repr(),
+            f"Constant output={net.cli_repr()} [signal-A: 10, rail-signal: 20] (off)",
+        )
+        const = Constant()
+        self.assertEqual(const.cli_repr(), f"Constant output=- [] (on)")

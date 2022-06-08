@@ -184,3 +184,12 @@ class Operation(TwoSidedASTNode):
             f"left={self.left}, "
             f"right={self.right})"
         )
+
+    def cli_repr(self) -> str:
+        return (
+            f"Operation "
+            f"input={self.input_network.cli_repr() if self.input_network else '-'} "
+            f"output={self.output_network.cli_repr() if self.output_network else '-'} "
+            f"({self.left.cli_repr()} {self.operation.value} {self.right.cli_repr()}) "
+            f"-> {self.result.cli_repr()}"
+        )

@@ -23,6 +23,10 @@ class Operand(ABC):
     def is_everything(self) -> bool:
         raise NotImplementedError
 
+    @abstractmethod
+    def cli_repr(self) -> str:
+        raise NotImplementedError
+
 
 class SignalOperand(Operand):
     def __init__(self, signal: Signal):
@@ -48,6 +52,9 @@ class SignalOperand(Operand):
     def __repr__(self) -> str:
         return f"SignalOperand(signal={self.signal!r})"
 
+    def cli_repr(self) -> str:
+        return f"{self.signal.value}"
+
 
 class ConstantOperand(Operand):
     def __init__(self, constant: np.int32):
@@ -72,3 +79,6 @@ class ConstantOperand(Operand):
 
     def __repr__(self) -> str:
         return f"ConstantOperand(constant={self.constant})"
+
+    def cli_repr(self) -> str:
+        return f"{self.constant}"

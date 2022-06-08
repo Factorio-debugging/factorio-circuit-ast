@@ -314,3 +314,23 @@ class TestOperation(unittest.TestCase):
         )
         op.tick()
         self.assertEqual(op.previous_result, {Signal.SIGNAL_A: 10})
+
+    def test_cli_repr(self):
+        o_net = get_nets()
+        i_net = get_nets()
+        op = Operation(NumericOperator.ADD, SignalOperand(Signal.SIGNAL_A))
+        self.assertEqual(
+            op.cli_repr(), "Operation input=- output=- (0 + 0) -> signal-A"
+        )
+        op = Operation(
+            NumericOperator.DIVIDE,
+            SignalOperand(Signal.SIGNAL_WHITE),
+            o_net,
+            i_net,
+            ConstantOperand(np.int32(10)),
+            SignalOperand(Signal.WATER),
+        )
+        self.assertEqual(
+            op.cli_repr(),
+            f"Operation input={i_net.cli_repr()} output={o_net.cli_repr()} (10 / water) -> signal-white",
+        )

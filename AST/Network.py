@@ -74,3 +74,6 @@ class Network:
 
     def __repr__(self) -> str:
         return f"Network(nid={self.id!r}, network={self.type!r})"
+
+    def cli_repr(self) -> str:
+        return f"n{self.id}"

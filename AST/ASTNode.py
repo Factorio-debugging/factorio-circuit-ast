@@ -29,6 +29,10 @@ class ASTNode(ABC):
     def tick(self) -> None:
         raise NotImplementedError
 
+    @abstractmethod
+    def cli_repr(self) -> str:
+        raise NotImplementedError
+
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, ASTNode):
             return (

@@ -518,3 +518,27 @@ class TestComparison(unittest.TestCase):
         cmp.right = ConstantOperand(np.int32(5))
         cmp.tick()
         self.assertEqual(cmp.previous_result, {})
+
+    def test_cli_repr(self):
+        o_net = get_nets()
+        i_net = get_nets()
+        cmp = Comparison(
+            DeciderOperator.EQUAL,
+            SignalOperand(Signal.SIGNAL_A),
+        )
+        self.assertEqual(
+            cmp.cli_repr(), "Comparison input=- output=- (0 = 0) -> signal-A (copy)"
+        )
+        cmp = Comparison(
+            DeciderOperator.GREATER_THAN,
+            SignalOperand(Signal.SIGNAL_R),
+            o_net,
+            i_net,
+            SignalOperand(Signal.SIGNAL_B),
+            ConstantOperand(np.int32(5)),
+            False,
+        )
+        self.assertEqual(
+            cmp.cli_repr(),
+            f"Comparison input={i_net.cli_repr()} output={o_net.cli_repr()} (signal-B > 5) -> signal-R (no_copy)",
+        )

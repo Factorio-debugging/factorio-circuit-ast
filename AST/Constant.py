@@ -34,3 +34,11 @@ class Constant(ASTNode):
             self.previous_result = self.signals
             if self.output_network:
                 self.output_network.update_signals(self.previous_result)
+
+    def cli_repr(self) -> str:
+        return (
+            f"Constant "
+            f"output={self.output_network.cli_repr() if self.output_network else '-'} "
+            f"[{', '.join(f'{sig.value}: {value}' for sig, value in self.signals.items())}] "
+            f"({'on' if self.is_on else 'off'})"
+        )

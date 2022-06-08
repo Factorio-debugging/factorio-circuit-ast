@@ -140,3 +140,13 @@ class TestDoubleNetwork(unittest.TestCase):
         self.assertNotEqual(net1, net2)
         net1.green = g_net
         self.assertEqual(net1, net2)
+
+    def test_cli_repr(self):
+        r_net = Network(network=NetworkType.RED)
+        g_net = Network(network=NetworkType.GREEN)
+        net = DoubleNetwork()
+        self.assertEqual(net.cli_repr(), "[r=-,g=-]")
+        net.red = r_net
+        self.assertEqual(net.cli_repr(), f"[r=n{r_net.id},g=-]")
+        net.green = g_net
+        self.assertEqual(net.cli_repr(), f"[r=n{r_net.id},g=n{g_net.id}]")
