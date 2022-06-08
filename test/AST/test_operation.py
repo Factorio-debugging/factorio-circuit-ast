@@ -305,3 +305,12 @@ class TestOperation(unittest.TestCase):
         op.tick()
         o_net.red.tick()
         self.assertEqual(o_net.get_signal(Signal.SIGNAL_WHITE), 20)
+
+    def test_no_output_net(self):
+        op = Operation(
+            NumericOperator.ADD,
+            SignalOperand(Signal.SIGNAL_A),
+            left=ConstantOperand(np.int32(10)),
+        )
+        op.tick()
+        self.assertEqual(op.previous_result, {Signal.SIGNAL_A: 10})
