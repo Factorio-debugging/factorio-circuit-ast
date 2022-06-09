@@ -91,3 +91,12 @@ class TestNetwork(unittest.TestCase):
     def test_cli_repr(self):
         net = Network()
         self.assertEqual(net.cli_repr(), f"n{net.id}")
+
+
+class TestGetOrCreateNetwork(unittest.TestCase):
+    def test(self):
+        net = Network(2048, NetworkType.RED)
+        self.assertIs(get_or_create_network(2048, NetworkType.RED), net)
+        with self.assertRaises(AssertionError):
+            get_or_create_network(2048, NetworkType.GREEN)
+        self.assertIsInstance(get_or_create_network(2049, NetworkType.GREEN), Network)

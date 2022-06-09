@@ -77,3 +77,12 @@ class Network:
 
     def cli_repr(self) -> str:
         return f"n{self.id}"
+
+
+def get_or_create_network(id: int, type: NetworkType) -> Network:
+    if id in networks:
+        assert (
+            net := networks[id]
+        ).type == type, "The stored network has the wrong type"
+        return net
+    return Network(id, type)
