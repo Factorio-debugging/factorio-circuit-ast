@@ -6,3 +6,4 @@ htmlcov/
 .coverage
 *.egg-info
 dist/
+*__pycache__/
