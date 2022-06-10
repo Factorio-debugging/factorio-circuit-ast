@@ -1,10 +1,4 @@
-# Factorio debugging
-
-This is a library and cli that enables debugging factorio circuits
-
-# Parts
-
-## AST
+# Factorio circuit AST
 
 This package contains a kind of Abstract Syntax Tree used for the interpreter. This can be built from the IR or a
-blueprint string
+blueprint string. It enables interpreting and debugging circuits.

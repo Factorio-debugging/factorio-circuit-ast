@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "factorio-circuit-ast"
+description = "A Package implementing an interpretable AST of factorio circuit logic"
+readme = "README.md"
+keywords = ["factorio", "blueprint", "ast", "emulator", "interpreter"]
+license = {text = "MIT License"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Interpreters",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.13",
+    "factorio-draftsman>=0.9.5",
+]
+dynamic = ["version"]
+
+[project.scripts]
+factorio-circuit-ast = "factorio_circuit_ast"
+
+[tool.setuptools]
+packages = ["factorio_circuit_ast"]

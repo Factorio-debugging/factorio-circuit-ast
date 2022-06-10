@@ -1,7 +1,7 @@
 import unittest
 
-from AST.Network import Network, NetworkType
-from AST.Operation import *
+from factorio_circuit_ast.Network import Network, NetworkType
+from factorio_circuit_ast.Operation import *
 
 
 class TestNumericOperator(unittest.TestCase):

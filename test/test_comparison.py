@@ -1,8 +1,8 @@
 import unittest
 
-from AST.Comparison import *
-from AST.Network import Network, NetworkType
-from AST.Signal import Signal, Signals
+from factorio_circuit_ast.Comparison import *
+from factorio_circuit_ast.Network import Network, NetworkType
+from factorio_circuit_ast.Signal import Signal, Signals
 
 
 class TestDeciderOperator(unittest.TestCase):

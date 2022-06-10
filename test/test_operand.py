@@ -1,6 +1,6 @@
 import unittest
 
-from AST.Operand import *
+from factorio_circuit_ast.Operand import *
 
 
 class TestSignalOperand(unittest.TestCase):

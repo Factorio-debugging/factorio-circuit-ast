@@ -1,7 +1,7 @@
 import unittest
 
-from AST.DoubleNetwork import *
-from AST.Signal import Signals
+from factorio_circuit_ast.DoubleNetwork import *
+from factorio_circuit_ast.Signal import Signals
 
 
 class TestDoubleNetwork(unittest.TestCase):

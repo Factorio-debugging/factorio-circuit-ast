@@ -4,3 +4,5 @@
 htmlcov/
 .mypy_cache/
 .coverage
+*.egg-info
+dist/

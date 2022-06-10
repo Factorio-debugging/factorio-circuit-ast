@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-from AST.Constant import *
-from AST.Network import Network, NetworkType
-from AST.Signal import Signal
+from factorio_circuit_ast.Constant import *
+from factorio_circuit_ast.Network import Network, NetworkType
+from factorio_circuit_ast.Signal import Signal
 
 
 def get_nets() -> DoubleNetwork:
