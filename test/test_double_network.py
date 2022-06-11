@@ -150,3 +150,8 @@ class TestDoubleNetwork(unittest.TestCase):
         self.assertEqual(net.cli_repr(), f"[r=n{r_net.id},g=-]")
         net.green = g_net
         self.assertEqual(net.cli_repr(), f"[r=n{r_net.id},g=n{g_net.id}]")
+
+    def test_dependant_depends_no_network(self):
+        net = DoubleNetwork()
+        net.depends_on(None)
+        net.dependant_from(None)
