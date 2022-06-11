@@ -21,6 +21,8 @@ class ASTNode(ABC):
     ):
         self.name: str = name
         self.output_network: Optional[DoubleNetwork] = output_network
+        if self.output_network:
+            self.output_network.depends_on(self)
         self.previous_result: Optional[Signals] = None
         self.id = nid if nid is not None else max([*nodes.keys(), 0]) + 1
         nodes[self.id] = self

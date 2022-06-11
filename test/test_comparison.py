@@ -86,6 +86,10 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(cmp.right, SignalOperand(Signal.SIGNAL_R))
         self.assertEqual(cmp.copy_count_from_input, False)
         self.assertIs(cmp.input_network, i_net)
+        self.assertEqual(cmp, i_net.red.dependants[0]())
+        self.assertEqual(cmp, i_net.green.dependants[0]())
+        self.assertEqual(cmp, o_net.red.depends[0]())
+        self.assertEqual(cmp, o_net.green.depends[0]())
         self.assertIs(cmp.output_network, o_net)
 
     @staticmethod

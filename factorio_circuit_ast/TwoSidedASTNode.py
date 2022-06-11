@@ -18,6 +18,8 @@ class TwoSidedASTNode(ASTNode, ABC):
     ):
         super().__init__(name, output_network, nid)
         self.input_network: Optional[DoubleNetwork] = input_network
+        if self.input_network:
+            self.input_network.dependant_from(self)
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, TwoSidedASTNode):

@@ -2,6 +2,7 @@ from typing import Optional, Any
 
 import numpy as np
 
+from .ASTNode import ASTNode
 from .Network import Network, NetworkType
 from .Signal import Signal, WildcardSignal, Signals
 
@@ -74,3 +75,15 @@ class DoubleNetwork:
 
     def cli_repr(self) -> str:
         return f"[r={self.red.cli_repr() if self.red else '-'},g={self.green.cli_repr() if self.green else '-'}]"
+
+    def dependant_from(self, dependant: ASTNode) -> None:
+        if self.red:
+            self.red.dependant_from(dependant)
+        if self.green:
+            self.green.dependant_from(dependant)
+
+    def depends_on(self, depends: ASTNode) -> None:
+        if self.red:
+            self.red.depends_on(depends)
+        if self.green:
+            self.green.depends_on(depends)
