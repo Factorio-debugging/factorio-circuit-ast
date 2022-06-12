@@ -52,7 +52,8 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(net.get_signal(Signal.SIGNAL_A), 30)
         self.assertEqual(net.get_signal(Signal.ADVANCED_CIRCUIT), 500)
         net.update_signal(Signal.SIGNAL_A, np.int32(2**31 - 1))
-        net.update_signal(Signal.SIGNAL_A, np.int32(1))
+        with self.assertWarns(RuntimeWarning):
+            net.update_signal(Signal.SIGNAL_A, np.int32(1))
         net.tick()
         self.assertEqual(net.get_signal(Signal.SIGNAL_A), -(2**31))
         self.assertIsInstance(net.get_signal(Signal.SIGNAL_A), np.int32)

@@ -7,10 +7,11 @@ from factorio_circuit_ast.Operation import *
 class TestNumericOperator(unittest.TestCase):
     def test_add(self):
         self.assertEqual(NumericOperator.ADD.calculate(np.int32(1), np.int32(2)), 3)
-        self.assertEqual(
-            NumericOperator.ADD.calculate(np.int32(2**31 - 1), np.int32(1)),
-            -(2**31),
-        )
+        with self.assertWarns(RuntimeWarning):
+            self.assertEqual(
+                NumericOperator.ADD.calculate(np.int32(2**31 - 1), np.int32(1)),
+                -(2**31),
+            )
 
     def test_subtract(self):
         self.assertEqual(
