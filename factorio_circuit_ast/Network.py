@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Dict, Optional
+from typing import List, Optional
 from weakref import ref, ReferenceType
 
 import numpy as np
 
 from .ASTNode import ASTNode
 from .Signal import Signal, WildcardSignal, Signals
-
-networks: Dict[int, Network] = {}
 
 
 class NetworkType(Enum):
@@ -18,16 +16,13 @@ class NetworkType(Enum):
 
 
 class Network:
-    def __init__(
-        self, nid: Optional[int] = None, network: Optional[NetworkType] = None
-    ) -> None:
-        self.type: NetworkType = network if network else NetworkType.RED
+    def __init__(self, nid: int, network_type: NetworkType) -> None:
+        self.type: NetworkType = network_type
         self._depends: List[ReferenceType[ASTNode]] = []
         self._dependants: List[ReferenceType[ASTNode]] = []
         self._previous_state: Signals = {}
         self._current_state: Signals = {}
-        self.id = nid if nid is not None else max([*networks.keys(), 0]) + 1
-        networks[self.id] = self
+        self.id: int = nid
 
     def depends_on(self, node: ASTNode) -> None:
         self._depends.append(ref(node))
@@ -77,12 +72,3 @@ class Network:
 
     def cli_repr(self) -> str:
         return f"n{self.id}"
-
-
-def get_or_create_network(id: int, type: NetworkType) -> Network:
-    if id in networks:
-        assert (
-            net := networks[id]
-        ).type == type, "The stored network has the wrong type"
-        return net
-    return Network(id, type)

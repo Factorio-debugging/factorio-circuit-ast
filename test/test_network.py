@@ -6,33 +6,31 @@ from factorio_circuit_ast.Signal import Signals
 
 class TestNetwork(unittest.TestCase):
     def test_constructor(self):
-        net = Network()
+        net = Network(1, NetworkType.RED)
         self.assertEqual(net._depends, [])
         self.assertEqual(net._dependants, [])
         self.assertEqual(net._previous_state, {})
         self.assertEqual(net._current_state, {})
         self.assertIsInstance(net.id, int)
-        self.assertIs(networks[net.id], net)
         self.assertEqual(net.type, NetworkType.RED)
-        net = Network(nid=1024, network=NetworkType.GREEN)
+        net = Network(1024, NetworkType.GREEN)
         self.assertEqual(net.id, 1024)
-        self.assertIs(networks[1024], net)
         self.assertEqual(net.type, NetworkType.GREEN)
 
     def test_get_signal(self):
-        net = Network()
+        net = Network(1, NetworkType.RED)
         self.assertEqual(net.get_signal(Signal.ADVANCED_CIRCUIT), 0)
         with self.assertRaises(AssertionError):
             net.get_signal(Signal.SIGNAL_ANYTHING)
 
     def test_tick(self):
-        net = Network()
+        net = Network(1, NetworkType.RED)
         net._current_state[Signal.ADVANCED_CIRCUIT] = np.int32(10)
         net.tick()
         self.assertEqual(net.get_signal(Signal.ADVANCED_CIRCUIT), 10)
 
     def test_update_signal(self):
-        net = Network()
+        net = Network(1, NetworkType.RED)
         net.update_signal(Signal.SIGNAL_A, np.int32(10))
         with self.assertRaises(AssertionError):
             net.update_signal(Signal.SIGNAL_EVERYTHING, np.int32(0))
@@ -59,7 +57,7 @@ class TestNetwork(unittest.TestCase):
         self.assertIsInstance(net.get_signal(Signal.SIGNAL_A), np.int32)
 
     def test_get_signals(self):
-        net = Network()
+        net = Network(1, NetworkType.RED)
         self.assertEqual(net.get_signals(), {})
         net.update_signal(Signal.SIGNAL_A, np.int32(10))
         net.update_signal(Signal.SIGNAL_B, np.int32(30))
@@ -73,7 +71,7 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(net.get_signals(), {})
 
     def test_update_signals(self):
-        net = Network()
+        net = Network(1, NetworkType.RED)
         with self.assertRaises(AssertionError):
             net.update_signals({Signal.SIGNAL_EACH: 10})
         with self.assertRaises(AssertionError):
@@ -90,14 +88,5 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(net.get_signals(), values)
 
     def test_cli_repr(self):
-        net = Network()
+        net = Network(1, NetworkType.RED)
         self.assertEqual(net.cli_repr(), f"n{net.id}")
-
-
-class TestGetOrCreateNetwork(unittest.TestCase):
-    def test(self):
-        net = Network(2048, NetworkType.RED)
-        self.assertIs(get_or_create_network(2048, NetworkType.RED), net)
-        with self.assertRaises(AssertionError):
-            get_or_create_network(2048, NetworkType.GREEN)
-        self.assertIsInstance(get_or_create_network(2049, NetworkType.GREEN), Network)

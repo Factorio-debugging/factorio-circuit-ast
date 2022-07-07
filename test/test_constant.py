@@ -3,13 +3,16 @@ import unittest
 import numpy as np
 
 from factorio_circuit_ast.Constant import *
-from factorio_circuit_ast.Network import Network, NetworkType
 from factorio_circuit_ast.Signal import Signal
+from factorio_circuit_ast.NetworkLibrary import NetworkLibrary, NetworkType
+
+
+lib: NetworkLibrary = NetworkLibrary()
 
 
 def get_nets() -> DoubleNetwork:
-    r_net = Network(network=NetworkType.RED)
-    g_net = Network(network=NetworkType.GREEN)
+    r_net = lib.add_network(NetworkType.RED)
+    g_net = lib.add_network(NetworkType.GREEN)
     d_net = DoubleNetwork(r_net, g_net)
     return d_net
 

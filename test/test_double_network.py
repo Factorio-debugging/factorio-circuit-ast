@@ -2,6 +2,10 @@ import unittest
 
 from factorio_circuit_ast.DoubleNetwork import *
 from factorio_circuit_ast.Signal import Signals
+from factorio_circuit_ast.NetworkLibrary import NetworkLibrary, NetworkType
+
+
+lib: NetworkLibrary = NetworkLibrary()
 
 
 class TestDoubleNetwork(unittest.TestCase):
@@ -9,8 +13,8 @@ class TestDoubleNetwork(unittest.TestCase):
         d_net = DoubleNetwork()
         self.assertIsNone(d_net.red)
         self.assertIsNone(d_net.green)
-        r_net = Network(network=NetworkType.RED)
-        g_net = Network(network=NetworkType.GREEN)
+        r_net = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
         d_net = DoubleNetwork(r_net, g_net)
         self.assertIs(d_net.red, r_net)
         self.assertIs(d_net.green, g_net)
@@ -22,8 +26,8 @@ class TestDoubleNetwork(unittest.TestCase):
     def test_set_red(self):
         d_net = DoubleNetwork()
         with self.assertRaises(TypeError):
-            d_net.red = Network(network=NetworkType.GREEN)
-        r_net = Network(network=NetworkType.RED)
+            d_net.red = lib.add_network(NetworkType.GREEN)
+        r_net = lib.add_network(NetworkType.RED)
         d_net.red = r_net
         self.assertIs(d_net.red, r_net)
         d_net.red = None
@@ -32,8 +36,8 @@ class TestDoubleNetwork(unittest.TestCase):
     def test_set_green(self):
         d_net = DoubleNetwork()
         with self.assertRaises(TypeError):
-            d_net.green = Network(network=NetworkType.RED)
-        g_net = Network(network=NetworkType.GREEN)
+            d_net.green = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
         d_net.green = g_net
         self.assertIs(d_net.green, g_net)
         d_net.green = None
@@ -41,8 +45,8 @@ class TestDoubleNetwork(unittest.TestCase):
 
     def test_get_signal(self):
         d_net = DoubleNetwork()
-        r_net = Network(network=NetworkType.RED)
-        g_net = Network(network=NetworkType.GREEN)
+        r_net = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
         with self.assertRaises(AssertionError):
             d_net.get_signal(Signal.SIGNAL_EACH)
         self.assertEqual(d_net.get_signal(Signal.SIGNAL_A), 0)
@@ -61,8 +65,8 @@ class TestDoubleNetwork(unittest.TestCase):
 
     def test_get_signals(self):
         d_net = DoubleNetwork()
-        r_net = Network(network=NetworkType.RED)
-        g_net = Network(network=NetworkType.GREEN)
+        r_net = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
         self.assertEqual(d_net.get_signals(), {})
         d_net.red = r_net
         d_net.green = g_net
@@ -80,8 +84,8 @@ class TestDoubleNetwork(unittest.TestCase):
         )
 
     def test_update_signal(self):
-        r_net = Network(network=NetworkType.RED)
-        g_net = Network(network=NetworkType.GREEN)
+        r_net = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
         d_net = DoubleNetwork(r_net, g_net)
         with self.assertRaises(AssertionError):
             d_net.update_signal(Signal.SIGNAL_EACH, np.int32(10))
@@ -101,8 +105,8 @@ class TestDoubleNetwork(unittest.TestCase):
         self.assertEqual(r_net.get_signal(Signal.SIGNAL_A), 50)
 
     def test_update_signals(self):
-        r_net = Network(network=NetworkType.RED)
-        g_net = Network(network=NetworkType.GREEN)
+        r_net = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
         d_net = DoubleNetwork(r_net, g_net)
         with self.assertRaises(AssertionError):
             d_net.update_signals({Signal.SIGNAL_EACH: np.int32(10)})
@@ -126,8 +130,8 @@ class TestDoubleNetwork(unittest.TestCase):
         self.assertEqual(r_net.get_signals(), signals)
 
     def test_eq(self):
-        r_net = Network(network=NetworkType.RED)
-        g_net = Network(network=NetworkType.GREEN)
+        r_net = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
         net1 = DoubleNetwork()
         net2 = DoubleNetwork()
         self.assertNotEqual(net1, r_net)
@@ -142,8 +146,8 @@ class TestDoubleNetwork(unittest.TestCase):
         self.assertEqual(net1, net2)
 
     def test_cli_repr(self):
-        r_net = Network(network=NetworkType.RED)
-        g_net = Network(network=NetworkType.GREEN)
+        r_net = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
         net = DoubleNetwork()
         self.assertEqual(net.cli_repr(), "[r=-,g=-]")
         net.red = r_net
