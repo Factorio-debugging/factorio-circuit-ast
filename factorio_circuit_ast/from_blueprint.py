@@ -1,10 +1,7 @@
-from draftsman.prototypes.arithmetic_combinator import ArithmeticCombinator
-from draftsman.prototypes.decider_combinator import DeciderCombinator
-from draftsman.prototypes.constant_combinator import ConstantCombinator
-from draftsman.classes.mixins import CircuitConnectableMixin
-from typing import List, TypedDict, Optional, Dict
+from typing import List, TypedDict, Optional, Dict, Tuple
 from weakref import ReferenceType
-from .Network import Network, get_or_create_network, NetworkType
+
+from draftsman.classes.mixins import CircuitConnectableMixin
 
 
 class BaseEntityReference(TypedDict):
@@ -21,27 +18,14 @@ ConnectedEntities = List[EntityReference]
 Connections = Dict[str, Dict[str, ConnectedEntities]]
 
 
-def get_network_for_entity(
-    source: CircuitConnectableMixin, color: str, side: int = 1
-) -> Optional[Network]:
+def get_all_connections(
+    src: CircuitConnectableMixin, color: str, side: Optional[str] = None
+) -> List[Tuple[CircuitConnectableMixin, int]]:
     assert color in ("red", "green")
-    str_side: str = str(side)
-    circuit_id: Optional[int] = None
-    observed: List[CircuitConnectableMixin] = [source]
-    to_observe: List[CircuitConnectableMixin] = [source]
-    while to_observe:
-        current: CircuitConnectableMixin = to_observe.pop()
-        if current in observed:
-            continue
-        if (
-            current.connections
-            and current.connections[str_side]
-            and (conn := current.connections[str_side][color])
-        ):
-            for conn in conn:
-                if "circuit_id" in conn:
-                    circuit_id = conn['circuit_id']
-                    break
-                if entity := conn['entity_id']():
-                    to_observe.append(entity)
-    return get_or_create_network(sources[0]["circuit_id"], NetworkType(color))
+    side = side or "1"
+    assert side in ("1", "2")
+    net_side: Dict[str, ConnectedEntities]
+    conn: ConnectedEntities
+    if (net_side := src.connections.get(side)) and (conn := net_side.get(color)):
+        return [(i["entity_id"](), i.get("circuit_id", 1)) for i in conn]
+    return []
