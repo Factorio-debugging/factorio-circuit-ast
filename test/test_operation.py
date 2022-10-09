@@ -64,6 +64,19 @@ class TestNumericOperator(unittest.TestCase):
     def test_xor(self):
         self.assertEqual(NumericOperator.XOR.calculate(np.int32(15), np.int32(22)), 25)
 
+    def test_ir_repr(self):
+        self.assertEqual(NumericOperator.ADD.to_ir(), "add")
+        self.assertEqual(NumericOperator.SUBTRACT.to_ir(), "sub")
+        self.assertEqual(NumericOperator.MULTIPLY.to_ir(), "mult")
+        self.assertEqual(NumericOperator.DIVIDE.to_ir(), "div")
+        self.assertEqual(NumericOperator.MODULO.to_ir(), "mod")
+        self.assertEqual(NumericOperator.EXPONENT.to_ir(), "exp")
+        self.assertEqual(NumericOperator.LEFT_BIT_SHIFT.to_ir(), "lsh")
+        self.assertEqual(NumericOperator.RIGHT_BIT_SHIFT.to_ir(), "rsh")
+        self.assertEqual(NumericOperator.AND.to_ir(), "and")
+        self.assertEqual(NumericOperator.OR.to_ir(), "or")
+        self.assertEqual(NumericOperator.XOR.to_ir(), "xor")
+
 
 def get_nets() -> DoubleNetwork:
     r_net = lib.add_network(NetworkType.RED)

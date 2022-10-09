@@ -50,6 +50,14 @@ class TestDeciderOperator(unittest.TestCase):
         res = DeciderOperator.NOT_EQUAL.calculate(np.int32(10), np.int32(10))
         self.assertEqual(res, False)
 
+    def test_ir_repr(self):
+        self.assertEqual(DeciderOperator.EQUAL.to_ir(), "eq")
+        self.assertEqual(DeciderOperator.NOT_EQUAL.to_ir(), "nq")
+        self.assertEqual(DeciderOperator.GREATER_OR_EQUAL.to_ir(), "gq")
+        self.assertEqual(DeciderOperator.GREATER_THAN.to_ir(), "gt")
+        self.assertEqual(DeciderOperator.LESS_OR_EQUAL.to_ir(), "lq")
+        self.assertEqual(DeciderOperator.LESS_THAN.to_ir(), "lt")
+
 
 def get_nets() -> DoubleNetwork:
     r_net = lib.add_network(NetworkType.RED)
