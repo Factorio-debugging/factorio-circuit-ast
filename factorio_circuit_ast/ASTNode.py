@@ -59,4 +59,4 @@ class ASTNode(ABC):
             return (
                 self.name == other.name and self.output_network == other.output_network
             )
-        return False  # pragma: no cover
+        return False
