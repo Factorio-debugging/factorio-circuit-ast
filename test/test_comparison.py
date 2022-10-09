@@ -1,9 +1,8 @@
 import unittest
 
 from factorio_circuit_ast.Comparison import *
-from factorio_circuit_ast.Signal import Signal, Signals
 from factorio_circuit_ast.NetworkLibrary import NetworkLibrary, NetworkType
-
+from factorio_circuit_ast.Signal import Signal, Signals
 
 lib: NetworkLibrary = NetworkLibrary()
 
@@ -548,4 +547,26 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(
             cmp.cli_repr(),
             f"Comparison input={i_net.cli_repr()} output={o_net.cli_repr()} (signal-B > 5) -> signal-R (no_copy)",
+        )
+
+    def test_ir_repr(self):
+        o_net = get_nets()
+        i_net = get_nets()
+        cmp = Comparison(
+            DeciderOperator.EQUAL,
+            SignalOperand(Signal.SIGNAL_A),
+        )
+        self.assertEqual(cmp.to_ir(), "comp op=eq res=signal-A left=0 right=0 cpy")
+        cmp = Comparison(
+            DeciderOperator.GREATER_THAN,
+            SignalOperand(Signal.SIGNAL_R),
+            o_net,
+            i_net,
+            SignalOperand(Signal.SIGNAL_B),
+            ConstantOperand(np.int32(5)),
+            False,
+        )
+        self.assertEqual(
+            cmp.to_ir(),
+            f"comp op=gt res=signal-R left=signal-B right=5 {i_net.ir_repr('in')[:-1]} {o_net.ir_repr('out')[:-1]}",
         )

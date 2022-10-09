@@ -42,3 +42,13 @@ class Constant(ASTNode):
             f"[{', '.join(f'{sig.value}: {value}' for sig, value in self.signals.items())}] "
             f"({'on' if self.is_on else 'off'})"
         )
+
+    def to_ir(self) -> str:
+        res: str = "const "
+        if self.is_on:
+            res += "on "
+        for sig, num in self.signals.items():
+            res += f"sig={sig.value}={num} "
+        if self.output_network:
+            res += self.output_network.ir_repr("out")
+        return res[:-1]

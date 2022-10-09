@@ -87,3 +87,11 @@ class DoubleNetwork:
             self.red.depends_on(depends)
         if self.green:
             self.green.depends_on(depends)
+
+    def ir_repr(self, pre: str) -> str:
+        res = ""
+        if self.red:
+            res += f"{pre}r={self.red.id} "
+        if self.green:
+            res += f"{pre}g={self.green.id} "
+        return res

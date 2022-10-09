@@ -1,9 +1,8 @@
 import unittest
 
 from factorio_circuit_ast.DoubleNetwork import *
-from factorio_circuit_ast.Signal import Signals
 from factorio_circuit_ast.NetworkLibrary import NetworkLibrary, NetworkType
-
+from factorio_circuit_ast.Signal import Signals
 
 lib: NetworkLibrary = NetworkLibrary()
 
@@ -159,3 +158,13 @@ class TestDoubleNetwork(unittest.TestCase):
         net = DoubleNetwork()
         net.depends_on(None)
         net.dependant_from(None)
+
+    def test_ir_repr(self):
+        r_net = lib.add_network(NetworkType.RED)
+        g_net = lib.add_network(NetworkType.GREEN)
+        net = DoubleNetwork()
+        self.assertEqual(net.ir_repr("anything"), "")
+        net.red = r_net
+        self.assertEqual(net.ir_repr("in"), f"inr={r_net.id} ")
+        net.green = g_net
+        self.assertEqual(net.ir_repr("out"), f"outr={r_net.id} outg={g_net.id} ")

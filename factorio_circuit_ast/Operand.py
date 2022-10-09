@@ -27,6 +27,10 @@ class Operand(ABC):
     def cli_repr(self) -> str:
         raise NotImplementedError
 
+    @abstractmethod
+    def ir_repr(self) -> str:
+        raise NotImplementedError
+
 
 class SignalOperand(Operand):
     def __init__(self, signal: Signal):
@@ -55,6 +59,9 @@ class SignalOperand(Operand):
     def cli_repr(self) -> str:
         return f"{self.signal.value}"
 
+    def ir_repr(self) -> str:
+        return f"{self.signal.value}"
+
 
 class ConstantOperand(Operand):
     def __init__(self, constant: np.int32):
@@ -81,4 +88,7 @@ class ConstantOperand(Operand):
         return f"ConstantOperand(constant={self.constant})"
 
     def cli_repr(self) -> str:
+        return f"{self.constant}"
+
+    def ir_repr(self) -> str:
         return f"{self.constant}"

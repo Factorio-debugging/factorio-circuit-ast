@@ -47,6 +47,34 @@ class NumericOperator(Enum):
             return left ^ right
         raise NotImplementedError(f"Unknown operator {self}")
 
+    def to_ir(self) -> str:
+        result: str
+        if self == NumericOperator.ADD:
+            result = "add"
+        elif self == NumericOperator.SUBTRACT:
+            result = "sub"
+        elif self == NumericOperator.MULTIPLY:
+            result = "mult"
+        elif self == NumericOperator.DIVIDE:
+            result = "div"
+        elif self == NumericOperator.MODULO:
+            result = "mod"
+        elif self == NumericOperator.EXPONENT:
+            result = "exp"
+        elif self == NumericOperator.LEFT_BIT_SHIFT:
+            result = "lsh"
+        elif self == NumericOperator.RIGHT_BIT_SHIFT:
+            result = "rsh"
+        elif self == NumericOperator.AND:
+            result = "and"
+        elif self == NumericOperator.OR:
+            result = "or"
+        elif self == NumericOperator.XOR:
+            result = "xor"
+        else:
+            raise NotImplementedError(f"Unknown operator {self}")
+        return result
+
 
 class Operation(TwoSidedASTNode):
     def __init__(
@@ -193,3 +221,17 @@ class Operation(TwoSidedASTNode):
             f"({self.left.cli_repr()} {self.operation.value} {self.right.cli_repr()}) "
             f"-> {self.result.cli_repr()}"
         )
+
+    def to_ir(self) -> str:
+        res: str = (
+            f"op "
+            f"op={self.operation.to_ir()} "
+            f"res={self.result.ir_repr()} "
+            f"left={self.left.ir_repr()} "
+            f"right={self.right.ir_repr()} "
+        )
+        if self.input_network:
+            res += self.input_network.ir_repr("in")
+        if self.output_network:
+            res += self.output_network.ir_repr("out")
+        return res[:-1]

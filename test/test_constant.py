@@ -3,9 +3,8 @@ import unittest
 import numpy as np
 
 from factorio_circuit_ast.Constant import *
-from factorio_circuit_ast.Signal import Signal
 from factorio_circuit_ast.NetworkLibrary import NetworkLibrary, NetworkType
-
+from factorio_circuit_ast.Signal import Signal
 
 lib: NetworkLibrary = NetworkLibrary()
 
@@ -76,3 +75,18 @@ class TestConstant(unittest.TestCase):
         )
         const = Constant()
         self.assertEqual(const.cli_repr(), f"Constant output=- [] (on)")
+
+    def test_ir_repr(self):
+        net = get_nets()
+        sig: Signals = {
+            Signal.SIGNAL_A: np.int32(10),
+            Signal.RAIL_SIGNAL: np.int32(20),
+            Signal.ACCUMULATOR: np.int32(-10),
+        }
+        const = Constant(net, sig, False)
+        self.assertEqual(
+            const.to_ir(),
+            f"const sig=signal-A=10 sig=rail-signal=20 sig=accumulator=-10 {net.ir_repr('out')[:-1]}",
+        )
+        const = Constant()
+        self.assertEqual(const.to_ir(), f"const on")

@@ -35,6 +35,10 @@ class ASTNode(ABC):
     def cli_repr(self) -> str:
         raise NotImplementedError
 
+    @abstractmethod
+    def to_ir(self) -> str:
+        raise NotImplementedError
+
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, ASTNode):
             return (

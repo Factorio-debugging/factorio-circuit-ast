@@ -1,8 +1,7 @@
 import unittest
 
-from factorio_circuit_ast.Operation import *
 from factorio_circuit_ast.NetworkLibrary import NetworkLibrary, NetworkType
-
+from factorio_circuit_ast.Operation import *
 
 lib: NetworkLibrary = NetworkLibrary()
 
@@ -337,4 +336,24 @@ class TestOperation(unittest.TestCase):
         self.assertEqual(
             op.cli_repr(),
             f"Operation input={i_net.cli_repr()} output={o_net.cli_repr()} (10 / water) -> signal-white",
+        )
+
+    def test_ir_repr(self):
+        o_net = get_nets()
+        i_net = get_nets()
+        op = Operation(NumericOperator.ADD, SignalOperand(Signal.SIGNAL_A))
+        self.assertEqual(
+            op.to_ir(), "op op=add res=signal-A left=0 right=0"
+        )
+        op = Operation(
+            NumericOperator.DIVIDE,
+            SignalOperand(Signal.SIGNAL_WHITE),
+            o_net,
+            i_net,
+            ConstantOperand(np.int32(10)),
+            SignalOperand(Signal.WATER),
+        )
+        self.assertEqual(
+            op.to_ir(),
+            f"op op=div res=signal-white left=10 right=water {i_net.ir_repr('in')[:-1]} {o_net.ir_repr('out')[:-1]}",
         )

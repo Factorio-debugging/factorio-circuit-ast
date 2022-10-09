@@ -35,6 +35,24 @@ class DeciderOperator(Enum):
             raise NotImplementedError(f"Unknown operator {self}")
         return np.int32(result)
 
+    def to_ir(self) -> str:
+        result: str
+        if self == DeciderOperator.GREATER_THAN:
+            result = "gt"
+        elif self == DeciderOperator.LESS_THAN:
+            result = "lt"
+        elif self == DeciderOperator.GREATER_OR_EQUAL:
+            result = "gq"
+        elif self == DeciderOperator.LESS_OR_EQUAL:
+            result = "lq"
+        elif self == DeciderOperator.EQUAL:
+            result = "eq"
+        elif self == DeciderOperator.NOT_EQUAL:
+            result = "nq"
+        else:
+            raise NotImplementedError(f"Unknown operator {self}")
+        return result
+
 
 class Comparison(TwoSidedASTNode):
     def __init__(
@@ -226,3 +244,19 @@ class Comparison(TwoSidedASTNode):
             f"-> {self.result.cli_repr()} "
             f"({'copy' if self.copy_count_from_input else 'no_copy'})"
         )
+
+    def to_ir(self) -> str:
+        res: str = (
+            f"comp "
+            f"op={self.operation.to_ir()} "
+            f"res={self.result.ir_repr()} "
+            f"left={self.left.ir_repr()} "
+            f"right={self.right.ir_repr()} "
+        )
+        if self.copy_count_from_input:
+            res += "cpy "
+        if self.input_network:
+            res += self.input_network.ir_repr("in")
+        if self.output_network:
+            res += self.output_network.ir_repr("out")
+        return res[:-1]
