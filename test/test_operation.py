@@ -342,9 +342,7 @@ class TestOperation(unittest.TestCase):
         o_net = get_nets()
         i_net = get_nets()
         op = Operation(NumericOperator.ADD, SignalOperand(Signal.SIGNAL_A))
-        self.assertEqual(
-            op.to_ir(), "op op=add res=signal-A left=0 right=0"
-        )
+        self.assertEqual(op.to_ir(), "op op=add res=signal-A left=0 right=0")
         op = Operation(
             NumericOperator.DIVIDE,
             SignalOperand(Signal.SIGNAL_WHITE),
