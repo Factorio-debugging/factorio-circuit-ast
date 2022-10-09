@@ -67,7 +67,7 @@ class TestSignalOperand(unittest.TestCase):
 
 
 class TestConstantOperand(unittest.TestCase):
-    def test_constructo(self):
+    def test_constructor(self):
         op = ConstantOperand(np.int32(10))
         self.assertEqual(op.constant, 10)
 
