@@ -86,8 +86,9 @@ class Operation(TwoSidedASTNode):
         left: Optional[Operand] = None,
         right: Optional[Operand] = None,
         nid: Optional[int] = None,
+        alias: Optional[str] = None,
     ):
-        super().__init__("Operation", output_network, input_network, nid)
+        super().__init__("Operation", output_network, input_network, nid, alias)
         self.operation: NumericOperator = operation
         # set these for comparison
         self._left: Operand = left if left else ConstantOperand(np.int32(0))
@@ -222,7 +223,7 @@ class Operation(TwoSidedASTNode):
             f"-> {self.result.cli_repr()}"
         )
 
-    def to_ir(self) -> str:
+    def _inner_to_ir(self) -> str:
         res: str = (
             f"op "
             f"op={self.operation.to_ir()} "

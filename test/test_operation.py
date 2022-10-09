@@ -355,7 +355,7 @@ class TestOperation(unittest.TestCase):
         o_net = get_nets()
         i_net = get_nets()
         op = Operation(NumericOperator.ADD, SignalOperand(Signal.SIGNAL_A))
-        self.assertEqual(op.to_ir(), "op op=add res=signal-A left=0 right=0")
+        self.assertEqual(op._inner_to_ir(), "op op=add res=signal-A left=0 right=0")
         op = Operation(
             NumericOperator.DIVIDE,
             SignalOperand(Signal.SIGNAL_WHITE),
@@ -365,6 +365,6 @@ class TestOperation(unittest.TestCase):
             SignalOperand(Signal.WATER),
         )
         self.assertEqual(
-            op.to_ir(),
+            op._inner_to_ir(),
             f"op op=div res=signal-white left=10 right=water {i_net.ir_repr('in')[:-1]} {o_net.ir_repr('out')[:-1]}",
         )

@@ -564,7 +564,9 @@ class TestComparison(unittest.TestCase):
             DeciderOperator.EQUAL,
             SignalOperand(Signal.SIGNAL_A),
         )
-        self.assertEqual(cmp.to_ir(), "comp op=eq res=signal-A left=0 right=0 cpy")
+        self.assertEqual(
+            cmp._inner_to_ir(), "comp op=eq res=signal-A left=0 right=0 cpy"
+        )
         cmp = Comparison(
             DeciderOperator.GREATER_THAN,
             SignalOperand(Signal.SIGNAL_R),
@@ -575,6 +577,6 @@ class TestComparison(unittest.TestCase):
             False,
         )
         self.assertEqual(
-            cmp.to_ir(),
+            cmp._inner_to_ir(),
             f"comp op=gt res=signal-R left=signal-B right=5 {i_net.ir_repr('in')[:-1]} {o_net.ir_repr('out')[:-1]}",
         )

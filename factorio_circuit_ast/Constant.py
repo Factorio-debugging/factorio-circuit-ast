@@ -12,8 +12,9 @@ class Constant(ASTNode):
         signals: Optional[Signals] = None,
         is_on: bool = True,
         nid: Optional[int] = None,
+        alias: Optional[str] = None,
     ):
-        super().__init__("Constant", output_network, nid)
+        super().__init__("Constant", output_network, nid, alias)
         self.signals = signals if signals else {}
         self.is_on: bool = is_on
 
@@ -43,7 +44,7 @@ class Constant(ASTNode):
             f"({'on' if self.is_on else 'off'})"
         )
 
-    def to_ir(self) -> str:
+    def _inner_to_ir(self) -> str:
         res: str = "const "
         if self.is_on:
             res += "on "

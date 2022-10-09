@@ -85,8 +85,8 @@ class TestConstant(unittest.TestCase):
         }
         const = Constant(net, sig, False)
         self.assertEqual(
-            const.to_ir(),
+            const._inner_to_ir(),
             f"const sig=signal-A=10 sig=rail-signal=20 sig=accumulator=-10 {net.ir_repr('out')[:-1]}",
         )
         const = Constant()
-        self.assertEqual(const.to_ir(), f"const on")
+        self.assertEqual(const._inner_to_ir(), f"const on")

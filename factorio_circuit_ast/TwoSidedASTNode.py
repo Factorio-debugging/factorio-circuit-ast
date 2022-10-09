@@ -15,8 +15,9 @@ class TwoSidedASTNode(ASTNode, ABC):
         output_network: Optional[DoubleNetwork] = None,
         input_network: Optional[DoubleNetwork] = None,
         nid: Optional[int] = None,
+        alias: Optional[str] = None,
     ):
-        super().__init__(name, output_network, nid)
+        super().__init__(name, output_network, nid, alias)
         self.input_network: Optional[DoubleNetwork] = input_network
         if self.input_network:
             self.input_network.dependant_from(self)

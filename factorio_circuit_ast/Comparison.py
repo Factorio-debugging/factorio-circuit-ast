@@ -65,8 +65,9 @@ class Comparison(TwoSidedASTNode):
         right: Optional[Operand] = None,
         copy_count_from_input: bool = True,
         nid: Optional[int] = None,
+        alias: Optional[str] = None,
     ):
-        super().__init__("Comparison", output_network, input_network, nid)
+        super().__init__("Comparison", output_network, input_network, nid, alias)
         self.operation: DeciderOperator = operation
         self._result: SignalOperand = result
         self._left: Operand = left if left else ConstantOperand(np.int32(0))
@@ -245,7 +246,7 @@ class Comparison(TwoSidedASTNode):
             f"({'copy' if self.copy_count_from_input else 'no_copy'})"
         )
 
-    def to_ir(self) -> str:
+    def _inner_to_ir(self) -> str:
         res: str = (
             f"comp "
             f"op={self.operation.to_ir()} "
