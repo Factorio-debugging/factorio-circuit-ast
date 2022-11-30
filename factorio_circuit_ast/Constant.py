@@ -1,8 +1,8 @@
 from typing import Optional
 
-from .ASTNode import ASTNode
-from .DoubleNetwork import DoubleNetwork
-from .Signal import Signals, WildcardSignal
+from factorio_circuit_ast.AST.ASTNode import ASTNode
+from factorio_circuit_ast.AST.Signal import Signals, WildcardSignal
+from factorio_circuit_ast.Network.DoubleNetwork import DoubleNetwork
 
 
 class Constant(ASTNode):

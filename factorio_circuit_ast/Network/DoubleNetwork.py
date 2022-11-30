@@ -2,9 +2,9 @@ from typing import Optional, Any
 
 import numpy as np
 
-from .ASTNode import ASTNode
+from factorio_circuit_ast.AST.ASTNode import ASTNode
+from factorio_circuit_ast.AST.Signal import Signal, WildcardSignal, Signals
 from .Network import Network, NetworkType
-from .Signal import Signal, WildcardSignal, Signals
 
 
 class DoubleNetwork:

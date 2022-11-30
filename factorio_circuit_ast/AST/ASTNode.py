@@ -4,17 +4,17 @@ import string
 from abc import ABC, abstractmethod
 from typing import Optional, TYPE_CHECKING, Any, Dict, Tuple
 
+from factorio_circuit_ast.Mixin import IRMixin, CliMixin, TickMixin
 from .Signal import Signals
 
 if TYPE_CHECKING:
-    from .DoubleNetwork import DoubleNetwork
-
+    from factorio_circuit_ast.Network.DoubleNetwork import DoubleNetwork
 
 ALIAS_CHARACTERS: Tuple[str, ...] = (*string.ascii_letters, *string.digits, "_")
 nodes: Dict[int, ASTNode] = {}
 
 
-class ASTNode(ABC):
+class ASTNode(IRMixin, CliMixin, TickMixin, ABC):
     def __init__(
         self,
         name: str,
@@ -35,14 +35,6 @@ class ASTNode(ABC):
         self.previous_result: Optional[Signals] = None
         self.id = nid if nid is not None else max([*nodes.keys(), 0]) + 1
         nodes[self.id] = self
-
-    @abstractmethod
-    def tick(self) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    def cli_repr(self) -> str:
-        raise NotImplementedError
 
     @abstractmethod
     def _inner_to_ir(self) -> str:

@@ -14,7 +14,6 @@ class EntityReference(BaseEntityReference, total=False):
 
 ConnectedEntities = List[EntityReference]
 
-
 Connections = Dict[str, Dict[str, ConnectedEntities]]
 
 

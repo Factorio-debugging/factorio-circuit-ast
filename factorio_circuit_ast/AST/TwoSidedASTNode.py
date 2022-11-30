@@ -3,8 +3,8 @@ from typing import Optional, Any
 
 import numpy as np
 
+from factorio_circuit_ast.Network import DoubleNetwork
 from .ASTNode import ASTNode
-from .DoubleNetwork import DoubleNetwork
 from .Operand import Operand, SignalOperand, ConstantOperand
 
 

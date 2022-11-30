@@ -1,6 +1,6 @@
 import unittest
 
-from factorio_circuit_ast.NetworkLibrary import *
+from factorio_circuit_ast.Network.NetworkLibrary import *
 
 
 class TestNetworkLibrary(unittest.TestCase):

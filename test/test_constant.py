@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
+from factorio_circuit_ast.AST.Signal import Signal
 from factorio_circuit_ast.Constant import *
-from factorio_circuit_ast.NetworkLibrary import NetworkLibrary, NetworkType
-from factorio_circuit_ast.Signal import Signal
+from factorio_circuit_ast.Network.NetworkLibrary import NetworkLibrary, NetworkType
 
 lib: NetworkLibrary = NetworkLibrary()
 

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Optional
+from typing import List
 from weakref import ref, ReferenceType
 
 import numpy as np
 
-from .ASTNode import ASTNode
-from .Signal import Signal, WildcardSignal, Signals
+from factorio_circuit_ast.AST.ASTNode import ASTNode
+from factorio_circuit_ast.AST.Signal import Signal, WildcardSignal, Signals
 
 
 class NetworkType(Enum):

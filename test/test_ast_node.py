@@ -1,6 +1,6 @@
 import unittest
 
-from factorio_circuit_ast.ASTNode import *
+from factorio_circuit_ast.AST.ASTNode import *
 from .test_operation import get_nets
 
 

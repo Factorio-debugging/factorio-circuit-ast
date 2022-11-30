@@ -1,8 +1,7 @@
 import unittest
 
-from factorio_circuit_ast.DoubleNetwork import *
-from factorio_circuit_ast.NetworkLibrary import NetworkLibrary, NetworkType
-from factorio_circuit_ast.Signal import Signals
+from factorio_circuit_ast.Network.DoubleNetwork import *
+from factorio_circuit_ast.Network.NetworkLibrary import NetworkLibrary, NetworkType
 
 lib: NetworkLibrary = NetworkLibrary()
 
